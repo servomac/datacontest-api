@@ -1,7 +1,7 @@
 import pytest
 
 from datacontest.shared import response_object as res
-from datacontest.use_cases import request_objects as req
+from datacontest.shared import request_object as req
 
 
 @pytest.fixture
