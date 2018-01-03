@@ -10,7 +10,7 @@ def test_serialize_datathon_model():
                                subtitle='Subtitle',
                                description='An extense description',
                                metric='AUC')
-    
+
     expected_json = """
         {
             "id": "bdae3b21-4577-4e2f-a825-bbbc1aeb7c49",

@@ -2,7 +2,7 @@
 
 DataContest is a free software web app designed to host machine learning competitions.
 
-This repo contains the backend code of the application. It is designed with a form of clean architecture in mind.
+This repo contains the backend code of the application. It is designed with a form of [clean architecture](https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html) in mind.
 
 ## References
 

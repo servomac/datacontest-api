@@ -12,7 +12,7 @@ def domain_datathons():
                                  subtitle='Subtitle1',
                                  description='Description1',
                                  metric='AUC')
-    
+
     datathon_2 = models.Datathon('f4b236a4-5085-41e9-86dc-29d6923010b3',
                                  title='Title2',
                                  subtitle='Subtitle2',
