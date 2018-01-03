@@ -2,7 +2,8 @@ import pytest
 from unittest import mock
 
 from datacontest.domain import models
-from datacontest.use_cases import request_objects as ro
+from datacontest.shared import response_object as res
+from datacontest.use_cases import request_objects as req
 from datacontest.use_cases import datathon_use_cases as uc
 
 
@@ -28,11 +29,59 @@ def test_datathon_list_without_parameters(domain_datathons):
     repo.list.return_value = domain_datathons
 
     datathon_list_use_case = uc.DatathonListUseCase(repo)
-    request_object = ro.DatathonListRequestObject.from_dict({})
+    request_object = req.DatathonListRequestObject.from_dict({})
 
     response_object = datathon_list_use_case.execute(request_object)
 
     assert bool(response_object) is True
-    repo.list.assert_called_with()
+    repo.list.assert_called_with(filters=None)
 
     assert response_object.value == domain_datathons
+
+
+def test_datathon_list_with_filters(domain_datathons):
+    repo = mock.Mock()
+    repo.list.return_value = domain_datathons
+
+    datathon_list_use_case = uc.DatathonListUseCase(repo)
+    query_filters = {'any': 5}
+    request_object = req.DatathonListRequestObject.from_dict({
+        'filters': query_filters
+    })
+
+    response_object = datathon_list_use_case.execute(request_object)
+
+    assert bool(response_object) is True
+    repo.list.assert_called_with(filters=query_filters)
+    assert response_object.value == domain_datathons
+
+
+def test_datathon_list_handles_generic_error():
+    repo = mock.Mock()
+    repo.list.side_effect = Exception('Random error')
+
+    datathon_list_use_case = uc.DatathonListUseCase(repo)
+    request_object = req.DatathonListRequestObject.from_dict({})
+
+    response_object = datathon_list_use_case.execute(request_object)
+
+    assert bool(response_object) is False
+    assert response_object.value == {
+        'type': res.ResponseFailure.SYSTEM_ERROR,
+        'message': 'Exception: Random error',
+    }
+
+
+def test_datathon_list_handles_bad_request():
+    repo = mock.Mock()
+
+    datathon_list_use_case = uc.DatathonListUseCase(repo)
+    request_object = req.DatathonListRequestObject.from_dict({'filters': 1})
+
+    response_object = datathon_list_use_case.execute(request_object)
+
+    assert bool(response_object) is False
+    assert response_object.value == {
+        'type': res.ResponseFailure.PARAMETERS_ERROR,
+        'message': 'filters: Is not iterable',
+    }
