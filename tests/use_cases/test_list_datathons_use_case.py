@@ -2,6 +2,7 @@ import pytest
 from unittest import mock
 
 from datacontest.domain import models
+from datacontest.use_cases import request_objects as ro
 from datacontest.use_cases import datathon_use_cases as uc
 
 
@@ -27,7 +28,11 @@ def test_datathon_list_without_parameters(domain_datathons):
     repo.list.return_value = domain_datathons
 
     datathon_list_use_case = uc.DatathonListUseCase(repo)
-    result = datathon_list_use_case.execute()
+    request_object = ro.DatathonListRequestObject.from_dict({})
 
+    response_object = datathon_list_use_case.execute(request_object)
+
+    assert bool(response_object) is True
     repo.list.assert_called_with()
-    assert result == domain_datathons
+
+    assert response_object.value == domain_datathons
