@@ -1,5 +1,7 @@
-import pytest
+import datetime
 from unittest import mock
+
+import pytest
 
 from datacontest.domain import models
 from datacontest.shared import response_object as res
@@ -13,13 +15,15 @@ def domain_datathons():
                                  title='Title1',
                                  subtitle='Subtitle1',
                                  description='Description1',
-                                 metric='AUC')
+                                 metric='AUC',
+                                 end_date=datetime.datetime(2018, 1, 6, 13, 15, 0, 0))
 
     datathon_2 = models.Datathon('f4b236a4-5085-41e9-86dc-29d6923010b3',
                                  title='Title2',
                                  subtitle='Subtitle2',
                                  description='Description2',
-                                 metric='AUC')
+                                 metric='AUC',
+                                 end_date=datetime.datetime(2018, 1, 1, 13, 15, 0, 0))
 
     return [datathon_1, datathon_2]
 

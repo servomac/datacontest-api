@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from datacontest.domain import models
 
@@ -10,6 +11,7 @@ def test_datathon_model_init():
         subtitle='Subtitle',
         description='Some extense description',
         metric='AUC',
+        end_date=datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
     )
 
     assert datathon.id == identifier
@@ -17,6 +19,7 @@ def test_datathon_model_init():
     assert datathon.subtitle == 'Subtitle'
     assert datathon.description == 'Some extense description'
     assert datathon.metric == 'AUC'
+    assert datathon.end_date == datetime.datetime(2018, 1, 5, 13, 15, 0, 0)
 
 
 def test_datathon_model_from_dict():
@@ -27,6 +30,7 @@ def test_datathon_model_from_dict():
         'subtitle': 'Subtitle',
         'description': 'Some extense description',
         'metric': 'AUC',
+        'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0)
     })
 
     assert datathon.id == identifier
@@ -34,3 +38,4 @@ def test_datathon_model_from_dict():
     assert datathon.subtitle == 'Subtitle'
     assert datathon.description == 'Some extense description'
     assert datathon.metric == 'AUC'
+    assert datathon.end_date == datetime.datetime(2018, 1, 5, 13, 15, 0, 0)

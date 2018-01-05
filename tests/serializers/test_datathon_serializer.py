@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from datacontest.serializers import datathon_serializer as serializer
@@ -9,7 +10,8 @@ def test_serialize_datathon_model():
                                title='Title',
                                subtitle='Subtitle',
                                description='An extense description',
-                               metric='AUC')
+                               metric='AUC',
+                               end_date=datetime.datetime(2018, 1, 5, 13, 15, 0, 0))
 
     expected_json = """
         {
@@ -17,7 +19,8 @@ def test_serialize_datathon_model():
             "title": "Title",
             "subtitle": "Subtitle",
             "description": "An extense description",
-            "metric": "AUC"
+            "metric": "AUC",
+            "end_date": "2018-01-05T13:15:00"
         }
     """
 

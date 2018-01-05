@@ -11,6 +11,7 @@ class DatathonEncoder(json.JSONEncoder):
                 'subtitle': o.subtitle,
                 'description': o.description,
                 'metric': o.metric,
+                'end_date': o.end_date.isoformat(),
             }
         except AttributeError:
             return super().default(o)
