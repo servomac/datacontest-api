@@ -32,3 +32,10 @@ class MemRepo:
             result = [e for e in result if self._check(e, key, value)]
 
         return [models.Datathon.from_dict(e) for e in result]
+
+    def find_by_id(self, id):
+        for datathon in self._entries:
+            if datathon['id'] == id:
+                return models.Datathon.from_dict(datathon)
+
+        return None

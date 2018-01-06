@@ -83,3 +83,18 @@ def test_repository_list_with_filters_id(datathons):
         repo.list(filters={'id': '91090b75-65e9-4253-975c-6f8ad0eaa955'}),
         [datathon_1],
     )
+
+
+def test_find_by_id_success(datathons):
+    repo = memrepo.MemRepo(datathons)
+
+    domain_model = repo.find_by_id('g23236a4-5085-41e9-86dc-29d6923010s6')
+    assert isinstance(domain_model, DomainModel)
+    assert domain_model.id == datathon_3['id']
+    assert domain_model.description == datathon_3['description']
+
+
+def test_find_by_id_failure(datathons):
+    repo = memrepo.MemRepo(datathons)
+
+    assert repo.find_by_id('nonexistent') == None
