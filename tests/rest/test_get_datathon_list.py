@@ -28,3 +28,17 @@ def test_get(mock_use_case, client):
     assert json.loads(response.data.decode('UTF-8')) == [datathon_1]
     assert response.status_code == 200
     assert response.mimetype == 'application/json'
+
+
+@mock.patch('datacontest.use_cases.datathon_use_cases.DatathonListUseCase')
+def test_get_failed_response(mock_use_case, client):
+    mock_use_case().execute.return_value = res.ResponseFailure.build_system_error('test message')
+
+    response = client.get('/datathons')
+
+    assert json.loads(response.data.decode('utf-8')) == {
+        'type': 'SystemError',
+        'message': 'test message',
+    }
+    assert response.status_code == 500
+    assert response.mimetype == 'application/json'
