@@ -42,3 +42,19 @@ def test_get_failed_response(mock_use_case, client):
     }
     assert response.status_code == 500
     assert response.mimetype == 'application/json'
+
+
+@mock.patch('datacontest.use_cases.datathon_use_cases.DatathonListUseCase')
+def test_request_object_init_and_usage_with_filters(mock_use_case, client):
+    mock_use_case().execute.return_value = res.ResponseSuccess([])
+    request_object = mock.Mock()
+
+    request_object_class = 'datacontest.use_cases.request_objects.DatathonListRequestObject'
+    with mock.patch(request_object_class) as mock_request_object:
+        mock_request_object.from_dict.return_value = request_object
+        client.get('/datathons?filter_param1=value1&filter_param2=value2')
+
+        mock_request_object.from_dict.assert_called_with(
+            {'filters': {'param1': 'value1', 'param2': 'value2'}}
+        )
+        mock_use_case().execute.assert_called_with(request_object)

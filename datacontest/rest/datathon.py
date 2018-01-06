@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint, Response
+from flask import Blueprint, Response, request
 
 from datacontest.repositories import memrepo
 from datacontest.serializers import datathon_serializer
@@ -21,7 +21,17 @@ blueprint = Blueprint('datathon', __name__)
 
 @blueprint.route('/datathons', methods=['GET'])
 def datathons():
-    request_object = req.DatathonListRequestObject.from_dict({})
+    query_params = {
+        'filters': {},
+    }
+
+    # TODO this parameter passing seems so obscure to mee
+    # rethink, because it could be more semantic
+    for arg, values in request.args.items():
+        if arg.startswith('filter_'):
+            query_params['filters'][arg.replace('filter_', '')] = values
+
+    request_object = req.DatathonListRequestObject.from_dict(query_params)
 
     repo = memrepo.MemRepo()
     use_case = uc.DatathonListUseCase(repo)
