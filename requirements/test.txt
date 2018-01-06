@@ -1,4 +1,5 @@
-pytest
-tox
-coverage
-pytest-cov
+-r prod.txt
+
+pytest==3.3.2
+pytest-cov==2.5.1
+pytest-flask==0.10.0

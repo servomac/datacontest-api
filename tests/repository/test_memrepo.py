@@ -32,6 +32,7 @@ datathon_3 = {
     'end_date': datetime.datetime(2019, 1, 5, 20, 15, 0, 0),
 }
 
+
 @pytest.fixture
 def datathons():
     return [datathon_1, datathon_2, datathon_3]
@@ -40,7 +41,9 @@ def datathons():
 def _check_results(domain_models_list, data_list):
     assert len(domain_models_list) == len(data_list)
     assert all([isinstance(dm, DomainModel) for dm in domain_models_list])
-    assert set([dm.id for dm in domain_models_list]) == set([d['id'] for d in data_list])
+
+    domain_model_ids = set([m.id for m in domain_models_list])
+    assert domain_model_ids == set([d['id'] for d in data_list])
 
 
 def test_repository_list_without_parameters(datathons):
