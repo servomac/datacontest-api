@@ -12,7 +12,7 @@ datathon_1 = {
     'subtitle': 'Subtitle1',
     'description': 'Description1',
     'metric': 'AUC',
-    'end_date': datetime.datetime(2018, 1, 5, 18, 20, 9, 910076) 
+    'end_date': datetime.datetime(2018, 1, 5, 18, 20, 9, 910076)
 }
 
 datathons = [Datathon.from_dict(datathon_1)]
@@ -32,7 +32,8 @@ def test_get(mock_use_case, client):
 
 @mock.patch('datacontest.use_cases.datathon_use_cases.DatathonListUseCase')
 def test_get_failed_response(mock_use_case, client):
-    mock_use_case().execute.return_value = res.ResponseFailure.build_system_error('test message')
+    response_failure = res.ResponseFailure.build_system_error('test message')
+    mock_use_case().execute.return_value = response_failure
 
     response = client.get('/datathons')
 

@@ -51,3 +51,31 @@ class DatathonDetailRequestObject(req.ValidRequestObject):
 
     def __nonzero__(self):
         return True
+
+
+class UserRegisterRequestObject(req.ValidRequestObject):
+    def __init__(self, username, password, email):
+        self.username = username
+        self.password = password
+        self.email = email
+
+    @classmethod
+    def from_dict(cls, data):
+        invalid_req = req.InvalidRequestObject()
+
+        required_args = ['username', 'password', 'email']
+        for arg in required_args:
+            if arg not in data:
+                invalid_req.add_error(arg, 'Its a mandatory parameter!')
+
+        if invalid_req.has_errors():
+            return invalid_req
+
+        return UserRegisterRequestObject(
+            username=data['username'],
+            password=data['password'],
+            email=data['email'],
+        )
+
+    def __nonzero__(self):
+        return True

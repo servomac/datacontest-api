@@ -1,8 +1,6 @@
 import datetime
 from unittest import mock
 
-import pytest
-
 from datacontest.domain import models
 from datacontest.use_cases import request_objects as req
 from datacontest.use_cases import datathon_use_cases as uc

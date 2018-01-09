@@ -1,6 +1,30 @@
 from datacontest.shared.domain_model import DomainModel
 
 
+class User:
+    def __init__(self, id, username, password, email, created_at, is_admin):
+        self.id = id
+        self.username = username
+        self.password = password
+        self.email = email
+        self.created_at = created_at
+        self.is_admin = is_admin
+
+    @classmethod
+    def from_dict(cls, data):
+        return User(
+            id=data['id'],
+            username=data['username'],
+            password=data['password'],
+            email=data['email'],
+            created_at=data['created_at'],
+            is_admin=data['is_admin'],
+        )
+
+
+DomainModel.register(User)
+
+
 class Datathon:
     def __init__(self, id, title, subtitle, description, metric, end_date):
         self.id = id

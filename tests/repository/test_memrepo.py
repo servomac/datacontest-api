@@ -97,4 +97,4 @@ def test_find_by_id_success(datathons):
 def test_find_by_id_failure(datathons):
     repo = memrepo.MemRepo(datathons)
 
-    assert repo.find_by_id('nonexistent') == None
+    assert repo.find_by_id('nonexistent') is None

@@ -6,12 +6,13 @@ from datacontest.domain import models
 
 
 def test_serialize_datathon_model():
-    datathon = models.Datathon('bdae3b21-4577-4e2f-a825-bbbc1aeb7c49',
-                               title='Title',
-                               subtitle='Subtitle',
-                               description='An extense description',
-                               metric='AUC',
-                               end_date=datetime.datetime(2018, 1, 5, 13, 15, 0, 0))
+    datathon = models.Datathon(
+        'bdae3b21-4577-4e2f-a825-bbbc1aeb7c49',
+        title='Title',
+        subtitle='Subtitle',
+        description='An extense description',
+        metric='AUC',
+        end_date=datetime.datetime(2018, 1, 5, 13, 15, 0, 0))
 
     expected_json = """
         {

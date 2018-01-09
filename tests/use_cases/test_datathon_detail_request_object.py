@@ -12,7 +12,7 @@ def test_build_datathon_detail_request_object_success():
 
 def test_build_datathon_detail_request_object_without_params():
     with pytest.raises(TypeError):
-        req = ro.DatathonDetailRequestObject()
+        ro.DatathonDetailRequestObject()
 
 
 def test_build_datathon_detail_request_object_from_dict():

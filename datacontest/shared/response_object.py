@@ -15,6 +15,8 @@ class ResponseFailure:
     RESOURCE_ERROR = 'ResourceError'
     PARAMETERS_ERROR = 'ParametersError'
     SYSTEM_ERROR = 'SystemError'
+    AUTHENTICATION_ERROR = 'AuthenticationError'
+    AUTHORIZATION_ERROR = 'AuthorizationError'
 
     def __init__(self, type, message):
         self.type = type
@@ -45,6 +47,10 @@ class ResponseFailure:
     @classmethod
     def build_parameters_error(cls, message=None):
         return cls(cls.PARAMETERS_ERROR, message)
+
+    @classmethod
+    def build_authentication_error(cls, message=None):
+        return cls(cls.AUTHENTICATION_ERROR, message)
 
     @classmethod
     def build_from_invalid_request_object(cls, invalid_request_object):
