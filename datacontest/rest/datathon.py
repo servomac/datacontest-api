@@ -33,7 +33,7 @@ def datathons():
 
     request_object = req.DatathonListRequestObject.from_dict(query_params)
 
-    repo = memrepo.MemRepo()
+    repo = memrepo.DatathonMemRepo()
     use_case = uc.DatathonListUseCase(repo)
 
     response = use_case.execute(request_object)
@@ -49,7 +49,7 @@ def datathons():
 def datathon_detail(datathon_id):
     request_object = req.DatathonDetailRequestObject(datathon_id)
 
-    repo = memrepo.MemRepo()
+    repo = memrepo.DatathonMemRepo()
     use_case = uc.DatathonDetailUseCase(repo)
 
     response = use_case.execute(request_object)

@@ -47,27 +47,27 @@ def _check_results(domain_models_list, data_list):
 
 
 def test_repository_list_without_parameters(datathons):
-    repo = memrepo.MemRepo(datathons)
+    repo = memrepo.DatathonMemRepo(datathons)
 
     assert repo.list() == datathons
 
 
 def test_repository_list_with_invalid_params(datathons):
-    repo = memrepo.MemRepo(datathons)
+    repo = memrepo.DatathonMemRepo(datathons)
 
     with pytest.raises(KeyError):
         repo.list(filters={'false': 'wrong'})
 
 
 def test_repository_list_with_filters_unknown_operator(datathons):
-    repo = memrepo.MemRepo(datathons)
+    repo = memrepo.DatathonMemRepo(datathons)
 
     with pytest.raises(ValueError):
         repo.list(filters={'metric__in': ['AUC', 'accuracy']})
 
 
 def test_repository_list_with_filters_end_date(datathons):
-    repo = memrepo.MemRepo(datathons)
+    repo = memrepo.DatathonMemRepo(datathons)
 
     date = datetime.datetime(2018, 1, 5, 20, 15, 0, 0)
     _check_results(repo.list(filters={'end_date': date}), [datathon_2])
@@ -77,7 +77,7 @@ def test_repository_list_with_filters_end_date(datathons):
 
 
 def test_repository_list_with_filters_id(datathons):
-    repo = memrepo.MemRepo(datathons)
+    repo = memrepo.DatathonMemRepo(datathons)
 
     _check_results(
         repo.list(filters={'id': '91090b75-65e9-4253-975c-6f8ad0eaa955'}),
@@ -86,7 +86,7 @@ def test_repository_list_with_filters_id(datathons):
 
 
 def test_find_by_id_success(datathons):
-    repo = memrepo.MemRepo(datathons)
+    repo = memrepo.DatathonMemRepo(datathons)
 
     domain_model = repo.find_by_id('g23236a4-5085-41e9-86dc-29d6923010s6')
     assert isinstance(domain_model, DomainModel)
@@ -95,6 +95,6 @@ def test_find_by_id_success(datathons):
 
 
 def test_find_by_id_failure(datathons):
-    repo = memrepo.MemRepo(datathons)
+    repo = memrepo.DatathonMemRepo(datathons)
 
     assert repo.find_by_id('nonexistent') is None
