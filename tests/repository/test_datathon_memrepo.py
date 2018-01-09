@@ -2,7 +2,7 @@ import datetime
 import pytest
 
 from datacontest.shared.domain_model import DomainModel
-from datacontest.repositories import memrepo
+from datacontest.repositories.datathon import memrepo
 
 
 datathon_1 = {

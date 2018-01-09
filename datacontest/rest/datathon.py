@@ -2,7 +2,7 @@ import json
 
 from flask import Blueprint, Response, request
 
-from datacontest.repositories import memrepo
+from datacontest.repositories.datathon import memrepo
 from datacontest.serializers import datathon_serializer
 from datacontest.use_cases import datathon_use_cases as uc
 from datacontest.use_cases import request_objects as req
