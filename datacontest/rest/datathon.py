@@ -43,3 +43,20 @@ def datathons():
         mimetype='application/json',
         status=STATUS_CODES[response.type]
     )
+
+
+@blueprint.route('/datathons/<datathon_id>')
+def datathon_detail(datathon_id):
+    request_object = req.DatathonDetailRequestObject(datathon_id)
+
+    repo = memrepo.MemRepo()
+    use_case = uc.DatathonDetailUseCase(repo)
+
+    response = use_case.execute(request_object)
+
+    print(response)
+    return Response(
+        json.dumps(response.value, cls=datathon_serializer.DatathonEncoder),
+        mimetype='application/json',
+        status=STATUS_CODES[response.type]
+    )
