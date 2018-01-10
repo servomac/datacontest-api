@@ -1,3 +1,4 @@
+from datacontest.domain import models
 from datacontest.repositories import memrepo
 
 class UserMemRepo(memrepo.MemRepo):

@@ -1,14 +1,22 @@
+import datetime
+
 from datacontest.shared.domain_model import DomainModel
 
 
 class User:
-    def __init__(self, id, username, password, email, created_at, is_admin):
+    def __init__(self, id, username, password, email, created_at=None, is_admin=None):
         self.id = id
         self.username = username
         self.password = password
         self.email = email
         self.created_at = created_at
         self.is_admin = is_admin
+
+        if created_at is None:
+            self.created_at = datetime.datetime.now()
+
+        if is_admin is None:
+            self.is_admin = False
 
     @classmethod
     def from_dict(cls, data):
@@ -17,8 +25,8 @@ class User:
             username=data['username'],
             password=data['password'],
             email=data['email'],
-            created_at=data['created_at'],
-            is_admin=data['is_admin'],
+            created_at=data.get('created_at'),
+            is_admin=data.get('is_admin'),
         )
 
 

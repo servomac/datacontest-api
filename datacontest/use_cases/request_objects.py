@@ -53,7 +53,7 @@ class DatathonDetailRequestObject(req.ValidRequestObject):
         return True
 
 
-class UserRegisterRequestObject(req.ValidRequestObject):
+class UserRegistrationRequestObject(req.ValidRequestObject):
     def __init__(self, username, password, email):
         self.username = username
         self.password = password
@@ -67,11 +67,13 @@ class UserRegisterRequestObject(req.ValidRequestObject):
         for arg in required_args:
             if arg not in data:
                 invalid_req.add_error(arg, 'Its a mandatory parameter!')
+            elif not isinstance(data[arg], str):
+                invalid_req.add_error(arg, 'Must be a string.')
 
         if invalid_req.has_errors():
             return invalid_req
 
-        return UserRegisterRequestObject(
+        return UserRegistrationRequestObject(
             username=data['username'],
             password=data['password'],
             email=data['email'],
