@@ -18,7 +18,10 @@ def test_build_user_from_empty_dict():
 
 
 @freeze_time('2017-12-30')
-def test_build_user_from_dict_with_required_params():
+@mock.patch('bcrypt.hashpw')
+def test_build_user_from_dict_with_required_params(mocked_hashpw):
+    mocked_hashpw.return_value = ''
+
     identifier = '54fdfd17-3004-4666-8094-ba402995fa31'
     user = models.User.from_dict({
         'id': identifier,
@@ -31,14 +34,17 @@ def test_build_user_from_dict_with_required_params():
     assert isinstance(user, models.User)
     assert user.id == identifier
     assert user.username == 'username'
-    assert user.password == 'password'
     assert user.email == 'email@false.com'
     assert user.created_at == datetime.datetime(2017, 12, 30)
     assert user.is_admin == False
+    assert hasattr(user, 'hash')
 
 
 @freeze_time('2017-12-30')
-def test_build_user_from_dict_with_all_params():
+@mock.patch('bcrypt.hashpw')
+def test_build_user_from_dict_with_all_params(mocked_hashpw):
+    mocked_hashpw.return_value = 'mocked_hash'
+
     identifier = 'bf7fa690-b8a0-4e04-b668-55ac224f7019'
     created_at = datetime.datetime.now()
     user = models.User.from_dict({
@@ -52,14 +58,17 @@ def test_build_user_from_dict_with_all_params():
 
     assert user.id == identifier
     assert user.username == 'username'
-    assert user.password == 'password'
     assert user.email == 'email@email.com'
     assert user.created_at == created_at
     assert user.is_admin == 'is_admin'
+    assert user.hash == 'mocked_hash'
 
 
 @freeze_time('2017-12-30')
-def test_build_user_with_default_params():
+@mock.patch('bcrypt.hashpw')
+def test_build_user_with_default_params(mocked_hashpw):
+    mocked_hashpw.return_value = 'hash'
+
     identifier = '54fdfd17-3004-4666-8094-ba402995fa31'
     user = models.User(id=identifier,
                        username='username',
@@ -70,7 +79,18 @@ def test_build_user_with_default_params():
     assert isinstance(user, models.User)
     assert user.id == identifier
     assert user.username == 'username'
-    assert user.password == 'password'
     assert user.email == 'email@false.com'
     assert user.created_at == datetime.datetime(2017, 12, 30)
     assert user.is_admin == False
+    assert user.hash == 'hash'
+
+
+def test_user_password():
+    identifier = '54fdfd17-3004-4666-8094-ba402995fa31'
+    user = models.User(id=identifier,
+                       username='username',
+                       password='password',
+                       email='email@false.com')
+
+    assert user.is_valid_password('password') is True
+    assert user.is_valid_password('any') is False

@@ -1,5 +1,6 @@
 import datetime
 import pytest
+from unittest import mock
 
 from datacontest.domain import models
 from datacontest.shared.domain_model import DomainModel
@@ -35,7 +36,10 @@ def test_user_memrepo_list_without_parameters(users):
 
     assert repo.list() == users
 
-def test_repository_list_add(users):
+@mock.patch('bcrypt.hashpw')
+def test_repository_list_add(mocked_hashpw, users):
+    mocked_hashpw.return_value = 'mocked'
+
     repo = memrepo.UserMemRepo(users)
 
     user_3 = {
@@ -52,3 +56,4 @@ def test_repository_list_add(users):
     by_email = repo.list(filters={'email': '3@email.com'})
     assert len(by_email) == 1
     assert by_email[0].id == 'g23236a4-5085-41e9-86dc-29d6923010s6'
+    assert by_email[0].hash == 'mocked'

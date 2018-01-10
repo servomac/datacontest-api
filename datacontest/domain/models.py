@@ -7,7 +7,6 @@ class User:
     def __init__(self, id, username, password, email, created_at=None, is_admin=None):
         self.id = id
         self.username = username
-        self.password = password
         self.email = email
         self.created_at = created_at
         self.is_admin = is_admin
@@ -17,6 +16,8 @@ class User:
 
         if is_admin is None:
             self.is_admin = False
+
+        self.set_password(password)
 
     @classmethod
     def from_dict(cls, data):
@@ -28,6 +29,15 @@ class User:
             created_at=data.get('created_at'),
             is_admin=data.get('is_admin'),
         )
+
+    def set_password(self, password):
+        from bcrypt import hashpw, gensalt
+        self.hash = hashpw(password.encode('utf-8'), gensalt())
+
+    def is_valid_password(self, password):
+        from bcrypt import hashpw
+        return hashpw(password.encode('utf-8'), self.hash) == self.hash
+
 
 
 DomainModel.register(User)
