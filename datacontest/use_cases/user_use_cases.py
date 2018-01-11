@@ -1,3 +1,4 @@
+# TODO maybe repo should provide a method 'new_primary_key', to avoid depending on uuid specificities
 import uuid
 
 from datacontest.shared import use_case as uc
@@ -8,28 +9,36 @@ class UserRegistrationUseCase(uc.UseCase):
     def __init__(self, repo):
         self.repo = repo
 
+    def email_already_exists(self, email):
+        users_with_same_email = self.repo.list(filters={'email': email})
+        return len(users_with_same_email) > 0
+
     def process_request(self, request_object):
-        users_with_same_email = self.repo.list(
-            filters={'email': request_object.email})
-        if len(users_with_same_email) > 0:
-            return res.ResponseFailure.build_authentication_error('This email is already in use')
+        if self.email_already_exists(request_object.email):
+            return res.ResponseFailure.build_authentication_error(
+                'This email is already in use'
+            )
 
-
-        domain_user = self.repo.add(
-            id=uuid.uuid4(),
-            username=request_object.username,
-            password=request_object.password,
-            email=request_object.email)
+        # TODO identifier logic should rest behind the repo layer
+        identifier = str(uuid.uuid4())
+        # TODO add should not be from a dict
+        domain_user = self.repo.add({
+            'id': identifier,
+            'username': request_object.username,
+            'password': request_object.password,
+            'email': request_object.email
+        })
 
         if domain_user is None:
+            # TODO
             return res.ResponseFailure()
 
-        return res.ResponseSuccess(domain_user)
+        return res.ResponseCreationSuccess(domain_user)
 
 
-class UserLoginUseCase:
+class UserLoginUseCase(uc.UseCase):
     pass
 
 
-class UserLogoutUseCase:
+class UserLogoutUseCase(uc.UseCase):
     pass

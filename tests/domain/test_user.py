@@ -85,7 +85,7 @@ def test_build_user_with_default_params(mocked_hashpw):
     assert user.hash == 'hash'
 
 
-def test_user_password():
+def test_user_is_valid_password():
     identifier = '54fdfd17-3004-4666-8094-ba402995fa31'
     user = models.User(id=identifier,
                        username='username',
@@ -94,3 +94,16 @@ def test_user_password():
 
     assert user.is_valid_password('password') is True
     assert user.is_valid_password('any') is False
+
+
+def test_user_set_password():
+    identifier = '54fdfd17-3004-4666-8094-ba402995fa31'
+    user = models.User(id=identifier,
+                       username='username',
+                       password='password',
+                       email='email@false.com')
+
+    assert user.is_valid_password('password')
+
+    user.set_password('newpass')
+    assert user.is_valid_password('newpass')

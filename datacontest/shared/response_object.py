@@ -11,6 +11,14 @@ class ResponseSuccess:
     __bool__ = __nonzero__
 
 
+class ResponseCreationSuccess(ResponseSuccess):
+    CREATION_SUCCESS = 'CreationSuccess'
+
+    def __init__(self, *args, **kwargs):
+        super(ResponseCreationSuccess, self).__init__(*args, **kwargs)
+        self.type = self.CREATION_SUCCESS
+
+
 class ResponseFailure:
     RESOURCE_ERROR = 'ResourceError'
     PARAMETERS_ERROR = 'ParametersError'
