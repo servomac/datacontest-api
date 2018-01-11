@@ -4,6 +4,7 @@ from unittest import mock
 import pytest
 
 from datacontest.domain import models
+from datacontest.shared import response_object as res
 from datacontest.use_cases import request_objects as req
 from datacontest.use_cases import user_use_cases as uc
 
@@ -113,3 +114,24 @@ def test_user_registration_success(mock_uuid, domain_users):
     })
 
     assert response_object.value == {'mock': 'response'}
+
+
+def test_user_registration_handles_generic_error():
+    repo = mock.Mock()
+    repo.list.return_value = []
+    repo.add.side_effect = Exception('Random error')
+
+    user_registration_use_case = uc.UserRegistrationUseCase(repo)
+    request_object = req.UserRegistrationRequestObject.from_dict({
+        'username': 'user',
+        'password': 'pass',
+        'email': 'new@email.com',
+    })
+
+    response_object = user_registration_use_case.execute(request_object)
+
+    assert bool(response_object) is False
+    assert response_object.value == {
+        'type': res.ResponseFailure.SYSTEM_ERROR,
+        'message': 'Exception: Random error',
+    }

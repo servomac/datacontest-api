@@ -26,7 +26,6 @@ def register():
 
     response = use_case.execute(request_object)
 
-    #import ipdb; ipdb.set_trace()
     if bool(response) is True:
         body = json.dumps(response.value, cls=user_serializer.UserEncoder)
     else:
