@@ -85,11 +85,9 @@ def test_user_registration_with_existing_email(domain_users):
     }
 
 
-@mock.patch('uuid.uuid4')
-def test_user_registration_success(mock_uuid, domain_users):
-    mock_uuid.return_value = 'mocked_id'
-
+def test_user_registration_success(domain_users):
     repo = mock.Mock()
+    repo.build_primary_key.return_value = 'mocked_id'
     repo.list.return_value = []
     repo.add.return_value = {
         'mock': 'response'

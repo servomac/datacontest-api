@@ -5,6 +5,10 @@ class MemRepo:
         if entries:
             self._entries.extend(entries)
 
+    def build_primary_key(self):
+        import uuid
+        return str(uuid.uuid4())
+
     def _check(self, element, key, value):
         if '__' not in key:
             key = key + '__eq'

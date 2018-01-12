@@ -46,6 +46,17 @@ def _check_results(domain_models_list, data_list):
     assert domain_model_ids == set([d['id'] for d in data_list])
 
 
+def test_repository_build_primary_key():
+    repo = memrepo.DatathonMemRepo([])
+
+    pk1 = repo.build_primary_key()
+    pk2 = repo.build_primary_key()
+
+    assert isinstance(pk1, str) and isinstance(pk2, str)
+    assert pk1 != pk2
+    assert len(pk1) == len(pk2)
+
+
 def test_repository_list_without_parameters(datathons):
     repo = memrepo.DatathonMemRepo(datathons)
 

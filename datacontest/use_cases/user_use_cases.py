@@ -1,6 +1,3 @@
-# TODO maybe repo should provide a method 'new_primary_key', to avoid depending on uuid specificities
-import uuid
-
 from datacontest.shared import use_case as uc
 from datacontest.shared import response_object as res
 
@@ -19,8 +16,7 @@ class UserRegistrationUseCase(uc.UseCase):
                 'This email is already in use'
             )
 
-        # TODO identifier logic should rest behind the repo layer
-        identifier = str(uuid.uuid4())
+        identifier = self.repo.build_primary_key()
         # TODO add should not be from a dict
         domain_user = self.repo.add({
             'id': identifier,
