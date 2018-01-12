@@ -41,6 +41,6 @@ class MemRepo:
             if e[key] == value
         ]
 
-    def add(self, entry):
-        self._entries.append(entry)
-        return self.domain_model.from_dict(entry)
+    def add(self, **kwargs):
+        self._entries.append(kwargs)
+        return self.domain_model.from_dict(kwargs)

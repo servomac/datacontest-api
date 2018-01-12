@@ -48,7 +48,7 @@ def test_repository_list_add(mocked_hashpw, users):
         'password': 'pass',
         'email': '3@email.com'
     }
-    created_user = repo.add(user_3)
+    created_user = repo.add(**user_3)
 
     assert isinstance(created_user, models.User)
     assert len(repo.list()) == 3

@@ -104,12 +104,12 @@ def test_user_registration_success(domain_users):
 
     assert bool(response_object) is True
     repo.list.assert_called_with(filters={'email': 'new@email.com'})
-    repo.add.assert_called_with({
-        'id': 'mocked_id',
-        'username': 'user',
-        'password': 'pass',
-        'email': 'new@email.com',
-    })
+    repo.add.assert_called_with(
+        id='mocked_id',
+        username='user',
+        password='pass',
+        email='new@email.com',
+    )
 
     assert response_object.value == {'mock': 'response'}
 

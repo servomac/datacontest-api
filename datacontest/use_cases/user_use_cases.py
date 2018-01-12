@@ -11,23 +11,19 @@ class UserRegistrationUseCase(uc.UseCase):
         return len(users_with_same_email) > 0
 
     def process_request(self, request_object):
+
         if self.email_already_exists(request_object.email):
             return res.ResponseFailure.build_authentication_error(
                 'This email is already in use'
             )
 
         identifier = self.repo.build_primary_key()
-        # TODO add should not be from a dict
-        domain_user = self.repo.add({
-            'id': identifier,
-            'username': request_object.username,
-            'password': request_object.password,
-            'email': request_object.email
-        })
-
-        if domain_user is None:
-            # TODO
-            return res.ResponseFailure()
+        domain_user = self.repo.add(
+            id=identifier,
+            username=request_object.username,
+            password=request_object.password,
+            email=request_object.email,
+        )
 
         return res.ResponseCreationSuccess(domain_user)
 
