@@ -61,6 +61,10 @@ class ResponseFailure:
         return cls(cls.AUTHENTICATION_ERROR, message)
 
     @classmethod
+    def build_authorization_error(cls, message=None):
+        return cls(cls.AUTHORIZATION_ERROR, message)
+
+    @classmethod
     def build_from_invalid_request_object(cls, invalid_request_object):
         message = "\n".join(["{}: {}".format(err['parameter'], err['message'])
                              for err in invalid_request_object.errors])

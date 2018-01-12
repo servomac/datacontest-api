@@ -6,13 +6,13 @@ class UserRegistrationUseCase(uc.UseCase):
     def __init__(self, repo):
         self.repo = repo
 
-    def email_already_exists(self, email):
+    def _email_already_exists(self, email):
         users_with_same_email = self.repo.list(filters={'email': email})
         return len(users_with_same_email) > 0
 
     def process_request(self, request_object):
 
-        if self.email_already_exists(request_object.email):
+        if self._email_already_exists(request_object.email):
             return res.ResponseFailure.build_authentication_error(
                 'This email is already in use'
             )
@@ -29,7 +29,24 @@ class UserRegistrationUseCase(uc.UseCase):
 
 
 class UserLoginUseCase(uc.UseCase):
-    pass
+    def __init__(self, repo):
+        self.repo = repo
+
+    def process_request(self, request_object):
+        users = self.repo.list(filters={'username': request_object.username})
+        if len(users) != 1:
+            return res.ResponseFailure.build_resource_error(
+                'User not found!'
+            )
+
+        user = users[0]
+        if not user.is_valid_password(request_object.password):
+            return res.ResponseFailure.build_authorization_error(
+                'Invalid password!'
+            )
+
+        response = {'access_token': user.token}
+        return res.ResponseSuccess(response)
 
 
 class UserLogoutUseCase(uc.UseCase):

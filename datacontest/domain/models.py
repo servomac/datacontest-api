@@ -1,4 +1,5 @@
-import datetime
+from datetime import datetime, timedelta
+import jwt
 
 from datacontest.shared.domain_model import DomainModel
 
@@ -18,7 +19,7 @@ class User:
         self.is_admin = is_admin
 
         if created_at is None:
-            self.created_at = datetime.datetime.now()
+            self.created_at = datetime.now()
 
         if is_admin is None:
             self.is_admin = False
@@ -43,6 +44,24 @@ class User:
     def is_valid_password(self, password):
         from bcrypt import hashpw
         return hashpw(password.encode('utf-8'), self.hash) == self.hash
+
+    # TODO tot això s'ho hauria de menjar un JWTManager extern, o un Mixin?
+    @property
+    def token(self):
+        return self._generate_jwt_token()
+
+    def _generate_jwt_token(self, expiration_days=15):
+        payload = {
+            'user_id': self.id,
+            'exp': datetime.utcnow() + timedelta(days=expiration_days),
+        }
+
+        # TODO configurable (inject to the User or extract logic)
+        secret = 'asdjajskdhakjhasd'
+        algorithm = 'HS256'
+        token = jwt.encode(payload, secret, algorithm)
+
+        return token.decode('utf-8')
 
 
 DomainModel.register(User)
