@@ -50,16 +50,27 @@ class User:
     def token(self):
         return self._generate_jwt_token()
 
+    @property
+    def jwt_secret(self):
+        # TODO configurable (inject to the User or extract logic)
+        return 'asdjajskdhakjhasd'
+
+    def is_valid_token(self, token):
+        payload = jwt.decode(token, self.jwt_secret)
+
+        return (
+            payload.get('id') == self.id
+                and
+            datetime.datetime.now() < datetime.fromtimestamp(payload.get('exp'))
+        )
+
     def _generate_jwt_token(self, expiration_days=15):
         payload = {
             'user_id': self.id,
             'exp': datetime.utcnow() + timedelta(days=expiration_days),
         }
 
-        # TODO configurable (inject to the User or extract logic)
-        secret = 'asdjajskdhakjhasd'
-        algorithm = 'HS256'
-        token = jwt.encode(payload, secret, algorithm)
+        token = jwt.encode(payload, self.jwt_secret)
 
         return token.decode('utf-8')
 

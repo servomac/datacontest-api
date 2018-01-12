@@ -131,7 +131,7 @@ def test_user_jwt_token(mocked_hashpw):
     ))
     # TODO where there is the logic of JWT tokens? REST layer or user domain??
     # TODO  secret where is stored?
-    assert jwt.decode(token, 'asdjajskdhakjhasd') == {
+    assert jwt.decode(token, user.jwt_secret) == {
         'user_id': identifier,
         'exp': expected_expiration,
     }
