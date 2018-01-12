@@ -6,7 +6,6 @@ from datacontest.repositories.user import memrepo
 from datacontest.serializers import user_serializer
 from datacontest.use_cases import user_use_cases as uc
 from datacontest.use_cases import request_objects as req
-from datacontest.shared import response_object as res
 
 from datacontest.rest.utils import STATUS_CODES
 
@@ -31,7 +30,6 @@ def register():
     else:
         body = json.dumps(response.value)
 
-    
     return Response(body,
                     mimetype='application/json',
                     status=STATUS_CODES[response.type])

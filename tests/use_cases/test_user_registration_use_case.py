@@ -8,6 +8,7 @@ from datacontest.shared import response_object as res
 from datacontest.use_cases import request_objects as req
 from datacontest.use_cases import user_use_cases as uc
 
+
 @pytest.fixture
 def domain_users():
     user_1 = models.User(
@@ -17,7 +18,6 @@ def domain_users():
         email='1@email.com',
         is_admin=False,
         created_at=datetime.datetime(2018, 1, 1, 12, 15, 0, 0))
-
 
     user_2 = models.User(
         '',
@@ -46,14 +46,15 @@ def test_user_registration_without_parameters(domain_users):
         'type': 'ParametersError'
     }
 
+
 def test_user_registration_without_email(domain_users):
     repo = mock.Mock()
 
     user_registration_use_case = uc.UserRegistrationUseCase(repo)
     request_object = req.UserRegistrationRequestObject.from_dict({
         'username': 'user',
-        'password': 'pass'
-    }) 
+        'password': 'pass',
+    })
 
     response_object = user_registration_use_case.execute(request_object)
 
@@ -72,8 +73,8 @@ def test_user_registration_with_existing_email(domain_users):
     request_object = req.UserRegistrationRequestObject.from_dict({
         'username': 'user',
         'password': 'pass',
-        'email': '1@email.com'
-    }) 
+        'email': '1@email.com',
+    })
 
     response_object = user_registration_use_case.execute(request_object)
 

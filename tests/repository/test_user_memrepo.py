@@ -3,7 +3,6 @@ import pytest
 from unittest import mock
 
 from datacontest.domain import models
-from datacontest.shared.domain_model import DomainModel
 from datacontest.repositories.user import memrepo
 
 
@@ -33,8 +32,8 @@ def users():
 
 def test_user_memrepo_list_without_parameters(users):
     repo = memrepo.UserMemRepo(users)
-
     assert repo.list() == users
+
 
 @mock.patch('bcrypt.hashpw')
 def test_repository_list_add(mocked_hashpw, users):

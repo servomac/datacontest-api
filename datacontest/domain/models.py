@@ -4,7 +4,13 @@ from datacontest.shared.domain_model import DomainModel
 
 
 class User:
-    def __init__(self, id, username, password, email, created_at=None, is_admin=None):
+    def __init__(self,
+                 id,
+                 username,
+                 password,
+                 email,
+                 created_at=None,
+                 is_admin=None):
         self.id = id
         self.username = username
         self.email = email
@@ -37,7 +43,6 @@ class User:
     def is_valid_password(self, password):
         from bcrypt import hashpw
         return hashpw(password.encode('utf-8'), self.hash) == self.hash
-
 
 
 DomainModel.register(User)

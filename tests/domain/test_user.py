@@ -36,7 +36,7 @@ def test_build_user_from_dict_with_required_params(mocked_hashpw):
     assert user.username == 'username'
     assert user.email == 'email@false.com'
     assert user.created_at == datetime.datetime(2017, 12, 30)
-    assert user.is_admin == False
+    assert user.is_admin is False
     assert hasattr(user, 'hash')
 
 
@@ -81,7 +81,7 @@ def test_build_user_with_default_params(mocked_hashpw):
     assert user.username == 'username'
     assert user.email == 'email@false.com'
     assert user.created_at == datetime.datetime(2017, 12, 30)
-    assert user.is_admin == False
+    assert user.is_admin is False
     assert user.hash == 'hash'
 
 

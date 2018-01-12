@@ -1,3 +1,6 @@
+# TODO extract the schema validation, use some existing library
+# i.e. in both registration and login objects exists duplicated code
+
 import collections
 
 from datacontest.shared import request_object as req
@@ -81,3 +84,28 @@ class UserRegistrationRequestObject(req.ValidRequestObject):
 
     def __nonzero__(self):
         return True
+
+
+class UserLoginRequestObject(req.ValidRequestObject):
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    @classmethod
+    def from_dict(cls, data):
+        invalid_req = req.InvalidRequestObject()
+
+        required_args = ['username', 'password']
+        for arg in required_args:
+            if arg not in data:
+                invalid_req.add_error(arg, 'Its a mandatory parameter!')
+            elif not isinstance(data[arg], str):
+                invalid_req.add_error(arg, 'Must be a string.')
+
+        if invalid_req.has_errors():
+            return invalid_req
+
+        return UserLoginRequestObject(
+            username=data['username'],
+            password=data['password'],
+        )

@@ -6,7 +6,6 @@ from datacontest.repositories.datathon import memrepo
 from datacontest.serializers import datathon_serializer
 from datacontest.use_cases import datathon_use_cases as uc
 from datacontest.use_cases import request_objects as req
-from datacontest.shared import response_object as res
 
 from datacontest.rest.utils import STATUS_CODES
 
