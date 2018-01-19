@@ -23,3 +23,22 @@ class DatathonDetailUseCase(uc.UseCase):
             return res.ResponseFailure.build_resource_error('Id not found')
 
         return res.ResponseSuccess(domain_datathon)
+
+
+class CreateDatathonUseCase(uc.UseCase):
+
+    def __init__(self, repo):
+        # TODO add user repo?
+        self.repo = repo
+
+    def process_request(self, request_object):
+        # TODO user authentication?
+        identifier = self.repo.build_primary_key()
+        domain_datathon = self.repo.add(id=identifier,
+                                        title=request_object.title,
+                                        description=request_object.description,
+                                        metric=request_object.metric,
+                                        organizer_id=request_object.organizer_id,
+                                        end_date=request_object.end_date)
+
+        return res.ResponseCreationSuccess(domain_datathon)

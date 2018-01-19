@@ -4,3 +4,5 @@
 
  * JWT logic
    - Should be separated from our User domain model. Separation of concerns. Also separate configuration (secret, algorithm).
+
+ * Schema validation. The actual schema validation seems to be ocurring at the use case request objects level. Rethink.

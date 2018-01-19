@@ -69,7 +69,6 @@ def test_user_login_use_case_invalid_password():
 def test_user_login_use_case_success():
     mocked_user = mock.Mock()
     mocked_user.is_valid_password.return_value = True
-    mocked_user.token = 'mocked_token'
 
     repo = mock.Mock()
     repo.list.return_value = [mocked_user]
@@ -86,6 +85,4 @@ def test_user_login_use_case_success():
     mocked_user.is_valid_password.assert_called_with('any_pass')
 
     assert bool(response_object) is True
-    assert response_object.value == {
-        'access_token': 'mocked_token'
-    }
+    assert response_object.value == mocked_user

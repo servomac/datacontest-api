@@ -39,6 +39,33 @@ def datathons():
     )
 
 
+@blueprint.route('/datathons', methods=['POST'])
+def create_datathon(user):
+    # TODO!
+    args = request.get_json()
+
+    user_repo = user_memrepo.UserMemRepo
+    user = jwt_current_identity(user_repo, args.get('access_token'))
+    if user is None:
+        pass
+
+    request_object = req.CreateDatathonRequestObject(
+
+        organizer_id=user.id,
+    )
+
+    repo = memrepo.DatathonMemRepo()
+    use_case = uc.CreateDatathonUseCase(repo)
+
+    response = use_case.execute(request_object)
+
+    return Response(
+        json.dumps(response.value, cls=datathon_serializer.DatathonEncoder),
+        mimetype='application/json',
+        status=STATUS_CODE[response.type]
+    )
+
+
 @blueprint.route('/datathons/<datathon_id>')
 def datathon_detail(datathon_id):
     request_object = req.DatathonDetailRequestObject(datathon_id)

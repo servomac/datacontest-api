@@ -33,20 +33,20 @@ class UserLoginUseCase(uc.UseCase):
         self.repo = repo
 
     def process_request(self, request_object):
+        """ If valid, returns the required user """
         users = self.repo.list(filters={'username': request_object.username})
         if len(users) != 1:
             return res.ResponseFailure.build_resource_error(
                 'User not found!'
             )
 
-        user = users[0]
-        if not user.is_valid_password(request_object.password):
+        domain_user = users[0]
+        if not domain_user.is_valid_password(request_object.password):
             return res.ResponseFailure.build_authorization_error(
                 'Invalid password!'
             )
 
-        response = {'access_token': user.token}
-        return res.ResponseSuccess(response)
+        return res.ResponseSuccess(domain_user)
 
 
 class UserLogoutUseCase(uc.UseCase):

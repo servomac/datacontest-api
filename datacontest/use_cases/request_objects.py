@@ -56,6 +56,46 @@ class DatathonDetailRequestObject(req.ValidRequestObject):
         return True
 
 
+class CreateDatathonRequestObject(req.ValidRequestObject):
+
+    def __init__(self, title, description, metric, organizer_id, end_date):
+        self.title = title
+        self.description = description
+        self.metric = metric
+        self.organizer_id = organizer_id
+        self.end_date = end_date
+
+    @classmethod
+    def from_dict(cls, data):
+        invalid_req = req.InvalidRequestObject()
+
+        # TODO change this custom and naive schema validation..
+        required_args = [('organizer_id', int), ('title', str), ('description', str)]
+        for arg, arg_type in required_args:
+            if arg not in data:
+                invalid_req.add_error(arg, 'Its a mandatory parameter!')
+            elif not isinstance(data[arg], arg_type):
+                invalid_req.add_error(arg, 'Must be a {}.'.format(arg_type.__name__))
+
+        optional_args = ['metric', 'end_date']
+        for arg in optional_args:
+            if not isinstance(data.get(arg), str):
+                invalid_req.add_error(arg, 'Must be a string.')
+
+        # TODO format de end date? inspirarme en altres serializers
+
+        if invalid_req.has_errors():
+            return invalid_req
+
+        return CreateDatathonRequestObject(
+            title=data['title'],
+            description=data['description'],
+            metric=data.get('metric'),
+            organizer_id=data['organizer_id'],
+            end_date=data.get('end_date'),
+        )
+
+
 class UserRegistrationRequestObject(req.ValidRequestObject):
     def __init__(self, username, password, email):
         self.username = username
