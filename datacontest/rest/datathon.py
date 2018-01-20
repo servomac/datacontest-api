@@ -3,10 +3,12 @@ import json
 from flask import Blueprint, Response, request
 
 from datacontest.repositories.datathon import memrepo
+from datacontest.repositories.user import memrepo as user_memrepo
 from datacontest.serializers import datathon_serializer
 from datacontest.use_cases import datathon_use_cases as uc
 from datacontest.use_cases import request_objects as req
 
+from datacontest.rest.jwt import jwt_current_identity
 from datacontest.rest.utils import STATUS_CODES
 
 
@@ -41,10 +43,10 @@ def datathons():
 
 @blueprint.route('/datathons', methods=['POST'])
 def create_datathon(user):
-    # TODO!
+    # WIP
     args = request.get_json()
 
-    user_repo = user_memrepo.UserMemRepo
+    user_repo = user_memrepo.UserMemRepo()
     user = jwt_current_identity(user_repo, args.get('access_token'))
     if user is None:
         pass
@@ -62,7 +64,7 @@ def create_datathon(user):
     return Response(
         json.dumps(response.value, cls=datathon_serializer.DatathonEncoder),
         mimetype='application/json',
-        status=STATUS_CODE[response.type]
+        status=STATUS_CODES[response.type]
     )
 
 

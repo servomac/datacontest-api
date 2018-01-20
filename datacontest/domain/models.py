@@ -1,5 +1,4 @@
-from datetime import datetime, timedelta
-import jwt
+from datetime import datetime
 
 from datacontest.shared.domain_model import DomainModel
 
@@ -44,8 +43,6 @@ class User:
     def is_valid_password(self, password):
         from bcrypt import hashpw
         return hashpw(password.encode('utf-8'), self.hash) == self.hash
-
-
 
 
 DomainModel.register(User)

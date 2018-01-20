@@ -5,7 +5,6 @@ from unittest import mock
 from freezegun import freeze_time
 
 from datacontest.domain import models
-from datacontest.shared import response_object as res
 from datacontest.use_cases import request_objects as req
 from datacontest.use_cases import datathon_use_cases as uc
 
@@ -50,6 +49,7 @@ def test_create_datathon_without_parameters():
     }
 
 # TODO test user exists, passing also the users repo!
+
 
 @freeze_time('2017-12-01')
 def test_create_datathon_success(domain_datathons):
