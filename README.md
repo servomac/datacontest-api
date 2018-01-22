@@ -1,5 +1,7 @@
 # DataContest backend
 
+[![Build Status](https://circleci.com/gh/servomac/datacontest-api.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/servomac/datacontest-api)
+
 DataContest is a free software web app designed to host machine learning competitions.
 
 This repo contains the backend code of the application. It exposes an API to create and host datathons, with user authentication. It is designed with a kind of [clean architecture](https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html) in mind.
