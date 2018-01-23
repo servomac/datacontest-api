@@ -1,2 +1,7 @@
 __pycache__/
 .cache/
+
+.coverage
+
+test-reports/
+*.xml

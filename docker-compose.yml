@@ -10,4 +10,5 @@ services:
 
   pytest:
     extends: api
-    command: python -m pytest -vv
+    entrypoint: python -m pytest
+    command: -vv --cov
