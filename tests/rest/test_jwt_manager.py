@@ -63,8 +63,7 @@ def test_jwt_manager_build_and_decode_token():
     jwt = JWTManager()
     token = jwt.build_token('uuid', 1)
 
-    # TODO why this hour timelapse? timezones?
-    expected_expiration = 3600 + int(time.mktime(
+    expected_expiration = int(time.mktime(
         (datetime.datetime.utcnow() + datetime.timedelta(days=1)).timetuple()
     ))
 
@@ -109,13 +108,10 @@ def test_user_jwt_token(domain_user):
     jwt_manager = JWTManager()
     token = jwt_manager.build_token(domain_user.id)
 
-    import jwt
-    # TODO why this hour timelapse? timezones?
-    expected_expiration = 3600 + int(time.mktime(
+    expected_expiration = int(time.mktime(
         (datetime.datetime.utcnow() + datetime.timedelta(days=15)).timetuple()
     ))
-    # TODO where there is the logic of JWT tokens? REST layer or user domain??
-    # TODO  secret where is stored?
+
     assert jwt.decode(token, jwt_manager.secret) == {
         'id': domain_user.id,
         'exp': expected_expiration,
