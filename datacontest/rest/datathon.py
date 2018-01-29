@@ -8,7 +8,9 @@ from datacontest.serializers import datathon_serializer
 from datacontest.use_cases import datathon_use_cases as uc
 from datacontest.use_cases import request_objects as req
 
+from datacontest.shared import response_object as res
 from datacontest.rest.jwt import jwt_current_identity
+from datacontest.rest.jwt import JWTException
 from datacontest.rest.utils import STATUS_CODES
 
 
@@ -42,18 +44,28 @@ def datathons():
 
 
 @blueprint.route('/datathons', methods=['POST'])
-def create_datathon(user):
-    # WIP
+def create_datathon():
     args = request.get_json()
 
     user_repo = user_memrepo.UserMemRepo()
-    user = jwt_current_identity(user_repo, args.get('access_token'))
-    if user is None:
-        pass
+    try:
+        user = jwt_current_identity(user_repo, args.get('access_token'))
+    except JWTException as e:
+        return Response(
+            json.dumps({
+                'type': res.ResponseFailure.AUTHORIZATION_ERROR,
+                'message': str(e),
+            }),
+            mimetype='application/json',
+            status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
+        )
 
     request_object = req.CreateDatathonRequestObject(
-
-        organizer_id=user.id,
+        title=args.get('title'),
+        description=args.get('description'),
+        metric=args.get('metric'),
+        end_date=args.get('end_date'),
+        user=user,
     )
 
     repo = memrepo.DatathonMemRepo()

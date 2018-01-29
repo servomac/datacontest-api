@@ -37,6 +37,7 @@ class User:
         )
 
     def set_password(self, password):
+        # TODO the Hasher should be injected to a user factory¿?
         from bcrypt import hashpw, gensalt
         self.hash = hashpw(password.encode('utf-8'), gensalt())
 

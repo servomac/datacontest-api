@@ -62,7 +62,17 @@ class JWTManager:
 
 
 def jwt_current_identity(user_repo, access_token):
+    """
+    Given a user repository and an access token, returns the user
+    if the access token is valid and the user exists, None otherwise.
+
+    In case of invalid authorization, raises a JWTException.
+    """
+    if access_token is None:
+        raise JWTException('No token provided.')
+
     jwt_manager = JWTManager()
     user_id = jwt_manager.get_identity(access_token)
     user = user_repo.find_by_id(user_id)
+
     return user

@@ -129,3 +129,23 @@ def test_get_jwt_current_identity_success(domain_user):
     user = jwt_current_identity(user_repo, token)
     user_repo.find_by_id.assert_called_with(domain_user.id)
     assert user == domain_user
+
+
+def test_get_jwt_current_identity_failure():
+    user_repo = mock.Mock()
+    user_repo.find_by_id.return_value = None
+
+    with pytest.raises(JWTException):
+        jwt_current_identity(user_repo, None)
+
+
+def test_get_jwt_current_identity_not_found(domain_user):
+    user_repo = mock.Mock()
+    user_repo.find_by_id.return_value = None
+
+    jwt_manager = JWTManager()
+    token = jwt_manager.build_token(domain_user.id)
+
+    user = jwt_current_identity(user_repo, token)
+    user_repo.find_by_id.assert_called_with(domain_user.id)
+    assert user == None

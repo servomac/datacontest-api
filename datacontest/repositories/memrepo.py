@@ -41,6 +41,13 @@ class MemRepo:
             if e[key] == value
         ]
 
+    def find_by_id(self, id):
+        for entry in self._entries:
+            if entry['id'] == id:
+                return self.domain_model.from_dict(entry)
+
+        return None
+
     def add(self, **kwargs):
         self._entries.append(kwargs)
         return self.domain_model.from_dict(kwargs)
