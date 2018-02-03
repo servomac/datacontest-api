@@ -60,12 +60,22 @@ def create_datathon():
             status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
         )
 
+    if user is None:
+        return Response(
+            json.dumps({
+                'type': res.ResponseFailure.AUTHORIZATION_ERROR,
+                'message': 'User not found!',
+            }),
+            mimetype='application/json',
+            status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
+        )
+
     request_object = req.CreateDatathonRequestObject(
         title=args.get('title'),
         description=args.get('description'),
         metric=args.get('metric'),
         end_date=args.get('end_date'),
-        user=user,
+        organizer_id=user.id,
     )
 
     repo = memrepo.DatathonMemRepo()

@@ -129,6 +129,7 @@ def test_get_jwt_current_identity_success(domain_user):
     user = jwt_current_identity(user_repo, token)
     user_repo.find_by_id.assert_called_with(domain_user.id)
     assert user == domain_user
+    assert isinstance(user, models.User)
 
 
 def test_get_jwt_current_identity_failure():
