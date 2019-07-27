@@ -36,6 +36,7 @@ class CreateDatathonUseCase(uc.UseCase):
         identifier = self.repo.build_primary_key()
         domain_datathon = self.repo.add(id=identifier,
                                         title=request_object.title,
+                                        subtitle=request_object.subtitle,
                                         description=request_object.description,
                                         metric=request_object.metric,
                                         organizer_id=request_object.organizer_id,

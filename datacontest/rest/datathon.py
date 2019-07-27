@@ -12,7 +12,7 @@ from datacontest.shared import response_object as res
 from datacontest.rest.jwt import jwt_current_identity
 from datacontest.rest.jwt import JWTException
 from datacontest.rest.utils import STATUS_CODES
-
+#from datacontest.rest.decorators import authenticate_and_inject_user
 
 blueprint = Blueprint('datathon', __name__)
 
@@ -46,6 +46,7 @@ def datathons():
 @blueprint.route('/datathons', methods=['POST'])
 def create_datathon():
     args = request.get_json()
+    # TODO validate args contain access_token?
 
     user_repo = user_memrepo.UserMemRepo()
     try:
@@ -70,19 +71,16 @@ def create_datathon():
             status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
         )
 
-    request_object = req.CreateDatathonRequestObject(
-        title=args.get('title'),
-        description=args.get('description'),
-        metric=args.get('metric'),
-        end_date=args.get('end_date'),
-        organizer_id=user.id,
-    )
+    args_and_user = {**args, **{'organizer_id': user.id}}
+    request_object = req.CreateDatathonRequestObject.from_dict(args_and_user)
+    if bool(request_object) is False:
+        return Response(json.dumps(request_object.errors))
 
     repo = memrepo.DatathonMemRepo()
     use_case = uc.CreateDatathonUseCase(repo)
-
     response = use_case.execute(request_object)
 
+    # TODO if response creation failure?
     return Response(
         json.dumps(response.value, cls=datathon_serializer.DatathonEncoder),
         mimetype='application/json',
@@ -104,3 +102,19 @@ def datathon_detail(datathon_id):
         mimetype='application/json',
         status=STATUS_CODES[response.type]
     )
+
+
+# @blueprint.route('/datathons/<datathon_id>/', method="POST")
+# def datathon_subscription_or_update(datathon_id):
+#     """
+#     Endpoint representing different semantics depending on the user:
+#      - The organizer can update the datathon.
+#      - An user can join the competition while it's open.
+#     """
+#     pass
+
+
+
+# @blueprint.route('/datathons/<datathon_id>/', method="DELETE")
+# def datathon_delete(datathon_id):
+#    pass

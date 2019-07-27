@@ -2,6 +2,7 @@
 # i.e. in both registration and login objects exists duplicated code
 
 import collections
+from datetime import datetime
 
 from datacontest.shared import request_object as req
 
@@ -57,11 +58,14 @@ class DatathonDetailRequestObject(req.ValidRequestObject):
 
 
 class CreateDatathonRequestObject(req.ValidRequestObject):
+    EXPECTED_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
+    # TODO validare datetime isoformat ¿?¿?
 
-    def __init__(self, title, description, metric, organizer_id, end_date):
+    def __init__(self, title, subtitle, description, metric, organizer_id, end_date):
         self.title = title
+        self.subtitle = subtitle or ''
         self.description = description
-        self.metric = metric
+        self.metric = metric or 'AUC'
         self.organizer_id = organizer_id
         self.end_date = end_date
 
@@ -70,29 +74,37 @@ class CreateDatathonRequestObject(req.ValidRequestObject):
         invalid_req = req.InvalidRequestObject()
 
         # TODO change this custom and naive schema validation..
-        required_args = [('organizer_id', int), ('title', str), ('description', str)]
+        required_args = [('organizer_id', str), ('title', str), ('description', str)]
         for arg, arg_type in required_args:
             if arg not in data:
                 invalid_req.add_error(arg, 'Its a mandatory parameter!')
             elif not isinstance(data[arg], arg_type):
                 invalid_req.add_error(arg, 'Must be a {}.'.format(arg_type.__name__))
 
-        optional_args = ['metric', 'end_date']
+        # TODO test must be a string, if not string provided ¿?
+        optional_args = ['metric', 'end_date', 'subtitle']
         for arg in optional_args:
-            if not isinstance(data.get(arg), str):
+            if arg in data and not isinstance(data.get(arg), str):
                 invalid_req.add_error(arg, 'Must be a string.')
 
         # TODO format de end date? inspirarme en altres serializers
+        if 'end_date' in data:
+            try:
+                data['end_date'] = datetime.strptime(data['end_date'], cls.EXPECTED_DATETIME_FORMAT)
+            except ValueError as ex:
+                print(ex)
+                invalid_req.add_error('end_date', 'Must be a valid ISO 8601')
 
         if invalid_req.has_errors():
             return invalid_req
 
         return CreateDatathonRequestObject(
             title=data['title'],
+            subtitle=data.get('subtitle', None),
             description=data['description'],
-            metric=data.get('metric'),
+            metric=data.get('metric', None),
             organizer_id=data['organizer_id'],
-            end_date=data.get('end_date'),
+            end_date=data.get('end_date', None),
         )
 
 

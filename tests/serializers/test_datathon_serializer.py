@@ -12,7 +12,9 @@ def test_serialize_datathon_model():
         subtitle='Subtitle',
         description='An extense description',
         metric='AUC',
-        end_date=datetime.datetime(2018, 1, 5, 13, 15, 0, 0))
+        end_date=datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
+        organizer_id='971ce791-489b-46ab-ae78-a5eca3beaa5a',
+    )
 
     expected_json = """
         {
@@ -21,7 +23,8 @@ def test_serialize_datathon_model():
             "subtitle": "Subtitle",
             "description": "An extense description",
             "metric": "AUC",
-            "end_date": "2018-01-05T13:15:00"
+            "end_date": "2018-01-05T13:15:00",
+            "organizer_id": "971ce791-489b-46ab-ae78-a5eca3beaa5a"
         }
     """
 

@@ -13,7 +13,8 @@ def test_datathon_detail_success():
         subtitle='Subtitle1',
         description='Description1',
         metric='AUC',
-        end_date=datetime.datetime(2018, 1, 6, 13, 15, 0, 0)
+        end_date=datetime.datetime(2018, 1, 6, 13, 15, 0, 0),
+        organizer_id='971ce791-489b-46ab-ae78-a5eca3beaa5a',
     )
 
     repo = mock.Mock()

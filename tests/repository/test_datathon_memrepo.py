@@ -12,6 +12,7 @@ datathon_1 = {
     'description': 'Description1',
     'metric': 'AUC',
     'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
+    'organizer_id': 'f4b236a4-5085-41e9-86dc-29d6923010b3',
 }
 
 datathon_2 = {
@@ -21,6 +22,7 @@ datathon_2 = {
     'description': 'Description2',
     'metric': 'AUC',
     'end_date': datetime.datetime(2018, 1, 5, 20, 15, 0, 0),
+    'organizer_id': 'f4b236a4-5085-41e9-86dc-29d6923010b3',
 }
 
 datathon_3 = {
@@ -30,6 +32,7 @@ datathon_3 = {
     'description': 'Description3',
     'metric': 'accuracy',
     'end_date': datetime.datetime(2019, 1, 5, 20, 15, 0, 0),
+    'organizer_id': 'f4b236a4-5085-41e9-86dc-29d6923010b3',
 }
 
 

@@ -17,7 +17,8 @@ def domain_datathons():
         subtitle='Subtitle1',
         description='Description1',
         metric='AUC',
-        end_date=datetime.datetime(2018, 1, 6, 13, 15, 0, 0))
+        end_date=datetime.datetime(2018, 1, 6, 13, 15, 0, 0),
+        organizer_id='f4b236a4-5085-41e9-86dc-29d6923010b3')
 
     datathon_2 = models.Datathon(
         'f4b236a4-5085-41e9-86dc-29d6923010b3',
@@ -25,7 +26,8 @@ def domain_datathons():
         subtitle='Subtitle2',
         description='Description2',
         metric='AUC',
-        end_date=datetime.datetime(2018, 1, 1, 13, 15, 0, 0))
+        end_date=datetime.datetime(2018, 1, 1, 13, 15, 0, 0),
+        organizer_id='f4b236a4-5085-41e9-86dc-29d6923010b3')
 
     return [datathon_1, datathon_2]
 
@@ -42,16 +44,14 @@ def test_create_datathon_without_parameters():
     assert response_object.value == {
         'message': 'organizer_id: Its a mandatory parameter!\n'
                    'title: Its a mandatory parameter!\n'
-                   'description: Its a mandatory parameter!\n'
-                   'metric: Must be a string.\n'
-                   'end_date: Must be a string.',
+                   'description: Its a mandatory parameter!',
         'type': 'ParametersError',
     }
 
 # TODO test user exists, passing also the users repo!
 
 
-@freeze_time('2017-12-01')
+@freeze_time('2018-01-01')
 def test_create_datathon_success(domain_datathons):
     repo = mock.Mock()
     repo.build_primary_key.return_value = 'mocked_id'
@@ -61,11 +61,12 @@ def test_create_datathon_success(domain_datathons):
 
     create_datathon_use_case = uc.CreateDatathonUseCase(repo)
     request_object = req.CreateDatathonRequestObject.from_dict({
-        'organizer_id': 1,
         'title': 'Title',
+        'subtitle': 'Subtitle',
         'description': 'Description',
         'metric': 'AUC',
         'end_date': '2018-01-01T10:10:10',
+        'organizer_id': 'organizer_id',
     })
 
     response_object = create_datathon_use_case.execute(request_object)
@@ -74,10 +75,11 @@ def test_create_datathon_success(domain_datathons):
     repo.add.assert_called_with(
         id='mocked_id',
         title='Title',
+        subtitle='Subtitle',
         description='Description',
-        end_date='2018-01-01T10:10:10',
+        end_date=datetime.datetime(2018,1,1,10,10,10),
         metric='AUC',
-        organizer_id=1
+        organizer_id='organizer_id',
     )
 
     assert response_object.value == {'mock': 'response'}

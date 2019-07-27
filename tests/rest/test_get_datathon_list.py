@@ -12,7 +12,8 @@ datathon_1 = {
     'subtitle': 'Subtitle1',
     'description': 'Description1',
     'metric': 'AUC',
-    'end_date': datetime.datetime(2018, 1, 5, 18, 20, 9, 910076)
+    'end_date': datetime.datetime(2018, 1, 5, 18, 20, 9, 910076),
+    'organizer_id': '231c3tt1-489b-46ab-ae78-a5eca4sealfa'
 }
 
 datathons = [Datathon.from_dict(datathon_1)]

@@ -17,7 +17,8 @@ def domain_datathons():
         subtitle='Subtitle1',
         description='Description1',
         metric='AUC',
-        end_date=datetime.datetime(2018, 1, 6, 13, 15, 0, 0))
+        end_date=datetime.datetime(2018, 1, 6, 13, 15, 0, 0),
+        organizer_id='f4b236a4-5085-41e9-86dc-29d6923010b3')
 
     datathon_2 = models.Datathon(
         'f4b236a4-5085-41e9-86dc-29d6923010b3',
@@ -25,7 +26,8 @@ def domain_datathons():
         subtitle='Subtitle2',
         description='Description2',
         metric='AUC',
-        end_date=datetime.datetime(2018, 1, 1, 13, 15, 0, 0))
+        end_date=datetime.datetime(2018, 1, 1, 13, 15, 0, 0),
+        organizer_id='f4b236a4-5085-41e9-86dc-29d6923010b3')
 
     return [datathon_1, datathon_2]
 
