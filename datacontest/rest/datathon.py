@@ -1,3 +1,4 @@
+from functools import wraps
 import json
 
 from flask import Blueprint, Response, request
@@ -15,6 +16,42 @@ from datacontest.rest.utils import STATUS_CODES
 #from datacontest.rest.decorators import authenticate_and_inject_user
 
 blueprint = Blueprint('datathon', __name__)
+
+
+def login_required(f):
+    """
+     - Obtain the user associated to the provided token.
+     - and inject the user to the wrapped function.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        data = request.get_json()
+        user_repo = user_memrepo.UserMemRepo()
+        try:
+            user = jwt_current_identity(user_repo, data.get('access_token'))
+        except JWTException as e:
+            return Response(
+                json.dumps({
+                    'type': res.ResponseFailure.AUTHORIZATION_ERROR,
+                    'message': str(e),
+                }),
+                mimetype='application/json',
+                status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
+            )
+
+        if user is None:
+            return Response(
+                json.dumps({
+                    'type': res.ResponseFailure.AUTHORIZATION_ERROR,
+                    'message': 'User not found!',
+                }),
+                mimetype='application/json',
+                status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
+            )
+
+        return f(user, *args, **kwargs)
+    return decorated_function
+
 
 
 @blueprint.route('/datathons', methods=['GET'])
@@ -44,32 +81,9 @@ def datathons():
 
 
 @blueprint.route('/datathons', methods=['POST'])
-def create_datathon():
+@login_required
+def create_datathon(user):
     args = request.get_json()
-    # TODO validate args contain access_token?
-
-    user_repo = user_memrepo.UserMemRepo()
-    try:
-        user = jwt_current_identity(user_repo, args.get('access_token'))
-    except JWTException as e:
-        return Response(
-            json.dumps({
-                'type': res.ResponseFailure.AUTHORIZATION_ERROR,
-                'message': str(e),
-            }),
-            mimetype='application/json',
-            status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
-        )
-
-    if user is None:
-        return Response(
-            json.dumps({
-                'type': res.ResponseFailure.AUTHORIZATION_ERROR,
-                'message': 'User not found!',
-            }),
-            mimetype='application/json',
-            status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
-        )
 
     args_and_user = {**args, **{'organizer_id': user.id}}
     request_object = req.CreateDatathonRequestObject.from_dict(args_and_user)
