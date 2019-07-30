@@ -25,7 +25,17 @@ def login_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        data = request.get_json()
+        if not request.is_json:
+            return Response(
+                json.dumps({
+                    'type': res.ResponseFailure.PARAMETERS_ERROR,
+                    'message': 'Request body must be JSON.',
+                }),
+                mimetype='application/json',
+                status=STATUS_CODES[res.ResponseFailure.PARAMETERS_ERROR]
+            )
+
+        data = request.get_json(silent=True) or {}
         user_repo = user_memrepo.UserMemRepo()
         try:
             user = jwt_current_identity(user_repo, data.get('access_token'))
@@ -51,7 +61,6 @@ def login_required(f):
 
         return f(user, *args, **kwargs)
     return decorated_function
-
 
 
 @blueprint.route('/datathons', methods=['GET'])

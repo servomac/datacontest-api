@@ -10,7 +10,7 @@ services:
 
   pytest:
     extends: api
-    entrypoint: python -m pytest
+    entrypoint: python -m pytest -x
     command: -vv --cov
 
   pylint:

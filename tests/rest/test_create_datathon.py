@@ -4,7 +4,32 @@ import json
 
 from datacontest.domain.models import User
 
-# TODO what happens when data=None and content_type = json
+
+def test_create_datathon_without_json_content_type(client):
+    response = client.post('/datathons', data='Hello')
+    assert json.loads(response.data) == {
+        'message': 'Request body must be JSON.',
+        'type': 'ParametersError'
+    }
+    assert response.status_code == 400
+
+    response = client.post('/datathons')
+    assert json.loads(response.data) == {
+        'message': 'Request body must be JSON.',
+        'type': 'ParametersError'
+    }
+    assert response.status_code == 400
+
+
+def test_create_datathon_empty_request(client):
+    response = client.post('/datathons', content_type='application/json')
+
+    assert json.loads(response.data) == {
+        'message': 'No token provided.',
+        'type': 'AuthorizationError'
+    }
+    assert response.status_code == 401
+
 
 def test_create_datathon_unauthenticated(client):
     response = client.post('/datathons',

@@ -84,5 +84,6 @@ def test_create_datathon_success(domain_datathons):
 
 
 def test_create_datathon_failure(domain_datathons):
+    pass
     #repo = mock.Mock()
     #repo.add.raises ??
