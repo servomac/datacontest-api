@@ -92,9 +92,9 @@ def create_datathon(user):
 
     repo = memrepo.DatathonMemRepo()
     use_case = uc.CreateDatathonUseCase(repo)
+
     response = use_case.execute(request_object)
 
-    # TODO if response creation failure?
     return Response(
         json.dumps(response.value, cls=datathon_serializer.DatathonEncoder),
         mimetype='application/json',
@@ -105,6 +105,8 @@ def create_datathon(user):
 @blueprint.route('/datathons/<datathon_id>')
 def datathon_detail(datathon_id):
     request_object = req.DatathonDetailRequestObject(datathon_id)
+    if bool(request_object) is False:
+        return Response(json.dumps(request_object.errors))
 
     repo = memrepo.DatathonMemRepo()
     use_case = uc.DatathonDetailUseCase(repo)

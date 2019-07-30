@@ -59,7 +59,7 @@ class DatathonDetailRequestObject(req.ValidRequestObject):
 
 class CreateDatathonRequestObject(req.ValidRequestObject):
     EXPECTED_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
-    # TODO validare datetime isoformat ¿?¿?
+    VALID_METRICS = ('AUC', 'ACCURACY', 'RMSE', 'RSE',)
 
     def __init__(self, title, subtitle, description, metric, organizer_id, end_date):
         self.title = title
@@ -81,19 +81,26 @@ class CreateDatathonRequestObject(req.ValidRequestObject):
             elif not isinstance(data[arg], arg_type):
                 invalid_req.add_error(arg, 'Must be a {}.'.format(arg_type.__name__))
 
-        # TODO test must be a string, if not string provided ¿?
         optional_args = ['metric', 'end_date', 'subtitle']
         for arg in optional_args:
             if arg in data and not isinstance(data.get(arg), str):
                 invalid_req.add_error(arg, 'Must be a string.')
 
-        # TODO format de end date? inspirarme en altres serializers
-        if 'end_date' in data:
+        if 'end_date' in data and isinstance(data['end_date'], str):
             try:
-                data['end_date'] = datetime.strptime(data['end_date'], cls.EXPECTED_DATETIME_FORMAT)
+                data['end_date'] = datetime.strptime(
+                    data['end_date'],
+                    cls.EXPECTED_DATETIME_FORMAT,
+                )
             except ValueError as ex:
-                print(ex)
                 invalid_req.add_error('end_date', 'Must be a valid ISO 8601')
+
+        if 'metric' in data and isinstance(data['metric'], str):
+            if data['metric'] not in cls.VALID_METRICS:
+                invalid_req.add_error(
+                    'metric',
+                    f"Must be a valid metric ({','.join(cls.VALID_METRICS)})."
+                )
 
         if invalid_req.has_errors():
             return invalid_req

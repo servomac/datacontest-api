@@ -48,8 +48,6 @@ def test_create_datathon_without_parameters():
         'type': 'ParametersError',
     }
 
-# TODO test user exists, passing also the users repo!
-
 
 @freeze_time('2018-01-01')
 def test_create_datathon_success(domain_datathons):
@@ -83,3 +81,8 @@ def test_create_datathon_success(domain_datathons):
     )
 
     assert response_object.value == {'mock': 'response'}
+
+
+def test_create_datathon_failure(domain_datathons):
+    #repo = mock.Mock()
+    #repo.add.raises ??

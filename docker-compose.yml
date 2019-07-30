@@ -12,3 +12,8 @@ services:
     extends: api
     entrypoint: python -m pytest
     command: -vv --cov
+
+  pylint:
+    extends: api
+    entrypoint: python -m pylint
+    command: datacontest

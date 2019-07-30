@@ -28,11 +28,9 @@ class DatathonDetailUseCase(uc.UseCase):
 class CreateDatathonUseCase(uc.UseCase):
 
     def __init__(self, repo):
-        # TODO add user repo?
         self.repo = repo
 
     def process_request(self, request_object):
-        # TODO user authentication?
         identifier = self.repo.build_primary_key()
         domain_datathon = self.repo.add(id=identifier,
                                         title=request_object.title,
@@ -41,5 +39,8 @@ class CreateDatathonUseCase(uc.UseCase):
                                         metric=request_object.metric,
                                         organizer_id=request_object.organizer_id,
                                         end_date=request_object.end_date)
+        if domain_datathon is None:
+            return res.ResponseFailure.build_resource_error(
+                'Error adding the datathon to the repository')
 
         return res.ResponseCreationSuccess(domain_datathon)
