@@ -90,3 +90,5 @@ def test_create_datathon(mock_jwt_identity, mock_mem_repo, client):
         'organizer_id': 'uuid-identifier',
     }
     assert response.status_code == 201
+
+# TODO test create datathon uc failure
