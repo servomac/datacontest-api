@@ -3,9 +3,10 @@ import json
 
 from flask import Blueprint, Response, request
 
-from datacontest.repositories.datathon import memrepo
+from datacontest.repositories.dataset import memrepo as dataset_memrepo
+from datacontest.repositories.datathon import memrepo as datathon_memrepo
 from datacontest.repositories.user import memrepo as user_memrepo
-from datacontest.serializers import datathon_serializer
+from datacontest.serializers import datathon_serializer, dataset_serializer
 from datacontest.use_cases import datathon_use_cases as uc
 from datacontest.use_cases import request_objects as req
 
@@ -77,7 +78,7 @@ def datathons():
 
     request_object = req.DatathonListRequestObject.from_dict(query_params)
 
-    repo = memrepo.DatathonMemRepo()
+    repo = datathon_memrepo.DatathonMemRepo()
     use_case = uc.DatathonListUseCase(repo)
 
     response = use_case.execute(request_object)
@@ -93,13 +94,13 @@ def datathons():
 @login_required
 def create_datathon(user):
     args = request.get_json()
-
     args_and_user = {**args, **{'organizer_id': user.id}}
+
     request_object = req.CreateDatathonRequestObject.from_dict(args_and_user)
     if bool(request_object) is False:
         return Response(json.dumps(request_object.errors))
 
-    repo = memrepo.DatathonMemRepo()
+    repo = datathon_memrepo.DatathonMemRepo()
     use_case = uc.CreateDatathonUseCase(repo)
 
     response = use_case.execute(request_object)
@@ -117,15 +118,36 @@ def datathon_detail(datathon_id):
     if bool(request_object) is False:
         return Response(json.dumps(request_object.errors))
 
-    repo = memrepo.DatathonMemRepo()
+    repo = datathon_memrepo.DatathonMemRepo()
     use_case = uc.DatathonDetailUseCase(repo)
 
     response = use_case.execute(request_object)
-
     return Response(
         json.dumps(response.value, cls=datathon_serializer.DatathonEncoder),
         mimetype='application/json',
         status=STATUS_CODES[response.type]
+    )
+
+
+@blueprint.route('/datathons/<datathon_id>/dataset', methods=['POST'])
+@login_required
+def upload_datathon_dataset(datathon_id, user):
+    args = request.get_json()
+    args_and_user = {**args, **{'organizer_id': user.id}}
+
+    request_object = req.UploadDatathonDatasetRequestObject.from_dict(args_and_user)
+    if bool(request_object) is False:
+        return Response(json.dumps(request_object.errors))
+
+    datathon_repo = datathon_memrepo.DatathonMemRepo()
+    dataset_repo = dataset_memrepo.DatasetMemRepo()
+    use_case = uc.UploadDatathonDataset(datathon_repo, dataset_repo)
+
+    response = use_case.execute(request_object)
+    return Response(
+        json.dumps(response.value, cls=dataset_serializer.DatasetEncoder),
+        mimetype='application/json',
+        status=STATUS_CODES[response.type],
     )
 
 

@@ -168,3 +168,38 @@ class UserLoginRequestObject(req.ValidRequestObject):
             username=data['username'],
             password=data['password'],
         )
+
+
+class UploadDatathonDatasetRequestObject(req.ValidRequestObject):
+    def __init__(self, datathon_id, user_id, training, validation, test, target_column):
+        self.datathon_id = datathon_id
+        self.user_id = user_id
+        self.training = training
+        self.validation = validation
+        self.test = test
+        self.target_column = target_column
+
+    @classmethod
+    def from_dict(cls, data):
+        invalid_req = req.InvalidRequestObject()
+
+        required_args = ['datathon_id', 'user_id', 'training', 'validation', 'test', 'target_column']
+        for arg in required_args:
+            if arg not in data:
+                invalid_req.add_error(arg, 'Its a mandatory parameter!')
+            elif not isinstance(data[arg], str):
+                invalid_req.add_error(arg, 'Must be a string.')
+
+        # TODO validate valid b64 files? or in the use case, as other validations?
+
+        if invalid_req.has_errors():
+            return invalid_req
+
+        return UploadDatathonDatasetRequestObject(
+            datathon_id=data['datathon_id'],
+            user_id=data['user_id'],
+            training=data['training'],
+            validation=data['validation'],
+            test=data['test'],
+            target_column=data['target_column'],
+        )

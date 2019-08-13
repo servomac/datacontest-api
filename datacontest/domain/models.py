@@ -72,6 +72,27 @@ class Datathon:
         )
 
 
+class Dataset:
+    def _init_(self, id, datathon_id, training, validation, test, target_column):
+        self.id = id
+        self.datathon_id = datathon_id
+        self.training = training
+        self.validation = validation
+        self.test = test
+        self.target_column = target_column
+
+    @classmethod
+    def from_dict(cls, data):
+        return Dataset(
+            id=data['id'],
+            datathon_id=data['datathon_id'],
+            training=data['training'],
+            validation=data['validation'],
+            test=data['test'],
+            target_column=data['target_column'],
+        )
+
+
 # https://docs.python.org/3/library/abc.html
 # You can also register unrelated concrete classes (even built-in classes)
 # and unrelated ABCs as “virtual subclasses” – these and their descendants
