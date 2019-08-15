@@ -116,6 +116,7 @@ def create_datathon(user):
 def datathon_detail(datathon_id):
     request_object = req.DatathonDetailRequestObject(datathon_id)
     if bool(request_object) is False:
+        # TODO status code
         return Response(json.dumps(request_object.errors))
 
     repo = datathon_memrepo.DatathonMemRepo()
@@ -131,13 +132,18 @@ def datathon_detail(datathon_id):
 
 @blueprint.route('/datathons/<datathon_id>/dataset', methods=['POST'])
 @login_required
-def upload_datathon_dataset(datathon_id, user):
+def upload_datathon_dataset(user, datathon_id):
     args = request.get_json()
-    args_and_user = {**args, **{'organizer_id': user.id}}
+    args_and_user = {**args, **{'user_id': user.id, 'datathon_id': datathon_id}}
 
     request_object = req.UploadDatathonDatasetRequestObject.from_dict(args_and_user)
     if bool(request_object) is False:
-        return Response(json.dumps(request_object.errors))
+        # TODO return Encoder for failure request?
+        return Response(
+            json.dumps(request_object.errors),
+            mimetype='application/json',
+            status=STATUS_CODES[res.ResponseFailure.PARAMETERS_ERROR]
+        )
 
     datathon_repo = datathon_memrepo.DatathonMemRepo()
     dataset_repo = dataset_memrepo.DatasetMemRepo()

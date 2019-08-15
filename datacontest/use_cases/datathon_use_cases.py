@@ -68,22 +68,20 @@ class UploadDatathonDataset(uc.UseCase):
         # datathon exists
         domain_datathon = self.datathon_repo.find_by_id(request_object.datathon_id)
         if domain_datathon is None:
-            return res.ResponseFailure.build_parameters_error(
-                'Datathon not found while adding a dataset'
+            return res.ResponseFailure.build_resource_error(
+                'Datathon not found.'
             )
 
         # user requesting is the organizer
         if domain_datathon.organizer_id != request_object.user_id:
-            return res.ResponseFailure.build_authorization_error(
-                'Only the organizer of a datathon can upload a dataset'
+            return res.ResponseFailure.build_authentication_error(
+                'Only the organizer of a datathon can upload a dataset.'
             )
-
-        # 
 
         identifier = self.dataset_repo.build_primary_key()
         domain_dataset = self.dataset_repo.add(
             id=identifier,
-            datathon_id=request_object.title,
+            datathon_id=request_object.datathon_id,
             training=request_object.training,
             validation=request_object.validation,
             test=request_object.test,

@@ -73,7 +73,7 @@ class Datathon:
 
 
 class Dataset:
-    def _init_(self, id, datathon_id, training, validation, test, target_column):
+    def __init__(self, id, datathon_id, training, validation, test, target_column):
         self.id = id
         self.datathon_id = datathon_id
         self.training = training
