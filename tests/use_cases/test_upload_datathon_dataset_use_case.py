@@ -1,18 +1,21 @@
+import datetime
+
 from unittest import mock
 
+from datacontest.domain import models
 from datacontest.shared import response_object as res
 from datacontest.use_cases import request_objects as req
 from datacontest.use_cases import datathon_use_cases as uc
 
 
-def test_upload_datathon_datset_use_case_without_parameters():
+def test_upload_datathon_dataset_without_parameters():
     datathon_repo = mock.Mock()
     dataset_repo = mock.Mock()
 
-    user_login_use_case = uc.UploadDatathonDataset(datathon_repo, dataset_repo)
+    use_case = uc.UploadDatathonDataset(datathon_repo, dataset_repo)
     request_object = req.UploadDatathonDatasetRequestObject.from_dict({})
 
-    response_object = user_login_use_case.execute(request_object)
+    response_object = use_case.execute(request_object)
 
     # TODO aixo no m'agrada perque estic responent a l'usuari que necessita introduir user_id quan no és vera
     # estic 'leacking' informació interna de paràmetres de l'API del request object, quan l'usuari final del
@@ -29,68 +32,147 @@ def test_upload_datathon_datset_use_case_without_parameters():
     }
 
 
-# def test_user_login_use_case_unexistent_user():
-#     repo = mock.Mock()
-#     repo.list.return_value = []
+def test_upload_datathon_dataset_datathon_not_found():
+    datathon_repo = mock.Mock()
+    datathon_repo.find_by_id.return_value = None
+    dataset_repo = mock.Mock()
 
-#     user_login_use_case = uc.UserLoginUseCase(repo)
-#     request_object = req.UserLoginRequestObject.from_dict({
-#         'username': 'unexistent',
-#         'password': 'pass',
-#     })
+    use_case = uc.UploadDatathonDataset(datathon_repo, dataset_repo)
+    request_object = req.UploadDatathonDatasetRequestObject.from_dict({
+        'datathon_id': 'datathon_identifier',
+        'user_id': 'organizer_identifier',
+        'training': 'any',
+        'validation': 'any',
+        'test': 'any',
+        'target_column': 'any',
+    })
 
-#     response_object = user_login_use_case.execute(request_object)
+    response_object = use_case.execute(request_object)
 
-#     repo.list.assert_called_with(filters={'username': 'unexistent'})
-#     assert bool(response_object) is False
-#     assert response_object.value == {
-#         'message': 'User not found!',
-#         'type': res.ResponseFailure.RESOURCE_ERROR,
-#     }
-
-
-# def test_user_login_use_case_invalid_password():
-#     mocked_user = mock.Mock()
-#     mocked_user.is_valid_password.return_value = False
-
-#     repo = mock.Mock()
-#     repo.list.return_value = [mocked_user]
-
-#     user_login_use_case = uc.UserLoginUseCase(repo)
-#     request_object = req.UserLoginRequestObject.from_dict({
-#         'username': 'any_user',
-#         'password': 'any_pass',
-#     })
-
-#     response_object = user_login_use_case.execute(request_object)
-
-#     repo.list.assert_called_with(filters={'username': 'any_user'})
-#     mocked_user.is_valid_password.assert_called_with('any_pass')
-
-#     assert bool(response_object) is False
-#     assert response_object.value == {
-#         'message': 'Invalid password!',
-#         'type': res.ResponseFailure.AUTHORIZATION_ERROR,
-#     }
+    datathon_repo.find_by_id.assert_called_with('datathon_identifier')
+    assert bool(response_object) is False
+    assert response_object.value == {
+        'message': 'Datathon not found.',
+        'type': res.ResponseFailure.RESOURCE_ERROR,
+    }
 
 
-# def test_user_login_use_case_success():
-#     mocked_user = mock.Mock()
-#     mocked_user.is_valid_password.return_value = True
+def test_upload_datathon_dataset_user_is_not_datathon_organizer():
+    datathon_repo = mock.Mock()
+    datathon_repo.find_by_id.return_value = models.Datathon.from_dict({
+        'id': 'datathon_identifier',
+        'organizer_id': 'organizer_identifier',
+        'title': 'title',
+        'subtitle': 'subtitle',
+        'description': 'desc',
+        'metric': 'AUC',
+        'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
+    })
+    dataset_repo = mock.Mock()
 
-#     repo = mock.Mock()
-#     repo.list.return_value = [mocked_user]
+    use_case = uc.UploadDatathonDataset(datathon_repo, dataset_repo)
+    request_object = req.UploadDatathonDatasetRequestObject.from_dict({
+        'datathon_id': 'datathon_identifier',
+        'user_id': 'not_organizer!',
+        'training': 'any',
+        'validation': 'any',
+        'test': 'any',
+        'target_column': 'any',
+    })
 
-#     user_login_use_case = uc.UserLoginUseCase(repo)
-#     request_object = req.UserLoginRequestObject.from_dict({
-#         'username': 'any_user',
-#         'password': 'any_pass',
-#     })
+    response_object = use_case.execute(request_object)
 
-#     response_object = user_login_use_case.execute(request_object)
+    datathon_repo.find_by_id.assert_called_with('datathon_identifier')
+    assert bool(response_object) is False
+    assert response_object.value == {
+        'message': 'Only the organizer of a datathon can upload a dataset.',
+        'type': res.ResponseFailure.AUTHENTICATION_ERROR,
+    }
 
-#     repo.list.assert_called_with(filters={'username': 'any_user'})
-#     mocked_user.is_valid_password.assert_called_with('any_pass')
 
-#     assert bool(response_object) is True
-#     assert response_object.value == mocked_user
+def test_upload_datathon_dataset_failure():
+    domain_datathon = models.Datathon.from_dict({
+        'id': 'datathon_id',
+        'organizer_id': 'organizer_id',
+        'title': 'title',
+        'subtitle': 'subtitle',
+        'description': 'desc',
+        'metric': 'AUC',
+        'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
+    })
+
+    datathon_repo = mock.Mock()
+    datathon_repo.find_by_id.return_value = domain_datathon
+    dataset_repo = mock.Mock()
+    dataset_repo.add.return_value = None
+
+    use_case = uc.UploadDatathonDataset(datathon_repo, dataset_repo)
+    request_object = req.UploadDatathonDatasetRequestObject.from_dict({
+        'datathon_id': 'datathon_id',
+        'user_id': 'organizer_id',
+        'training': 'any',
+        'validation': 'any',
+        'test': 'any',
+        'target_column': 'any',
+    })
+
+    response_object = use_case.execute(request_object)
+
+    assert response_object.value == {
+        'type': res.ResponseFailure.RESOURCE_ERROR,
+        'message': 'Error adding the dataset to the repository',
+    }
+    assert bool(response_object) is False
+
+
+def test_upload_datathon_dataset_success():
+    domain_datathon = models.Datathon.from_dict({
+        'id': 'datathon_id',
+        'organizer_id': 'organizer_id',
+        'title': 'title',
+        'subtitle': 'subtitle',
+        'description': 'desc',
+        'metric': 'AUC',
+        'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
+    })
+    domain_dataset = models.Dataset.from_dict({
+        'id': 'dataset_id',
+        'datathon_id': 'datathon_id',
+        'training': 'any',
+        'validation': 'any',
+        'test': 'any',
+        'target_column': 'any',
+    })
+
+    datathon_repo = mock.Mock()
+    datathon_repo.find_by_id.return_value = domain_datathon
+    dataset_repo = mock.Mock()
+    dataset_repo.build_primary_key.return_value = 'dataset_id'
+    dataset_repo.add.return_value = domain_dataset
+
+    use_case = uc.UploadDatathonDataset(datathon_repo, dataset_repo)
+    request_object = req.UploadDatathonDatasetRequestObject.from_dict({
+        'datathon_id': 'datathon_id',
+        'user_id': 'organizer_id',
+        'training': 'training',
+        'validation': 'validation',
+        'test': 'test',
+        'target_column': 'target_column',
+    })
+
+    response_object = use_case.execute(request_object)
+
+    datathon_repo.find_by_id.assert_called_once_with('datathon_id')
+    dataset_repo.add.assert_called_once_with(
+        id='dataset_id',
+        datathon_id='datathon_id',
+        training='training',
+        validation='validation',
+        test='test',
+        target_column='target_column'
+    )
+    assert bool(response_object) is True
+    assert response_object.value == domain_dataset
+
+# TODO als tests de user use cases he testetjat un side effect de l'add, i aquí no
+# com ho faig? homogeneitzar
