@@ -1,67 +1,18 @@
-from functools import wraps
 import json
 
 from flask import Blueprint, Response, request
 
 from datacontest.repositories.dataset import memrepo as dataset_memrepo
 from datacontest.repositories.datathon import memrepo as datathon_memrepo
-from datacontest.repositories.user import memrepo as user_memrepo
 from datacontest.serializers import datathon_serializer, dataset_serializer
 from datacontest.use_cases import datathon_use_cases as uc
 from datacontest.use_cases import request_objects as req
 
 from datacontest.shared import response_object as res
-from datacontest.rest.jwt import jwt_current_identity
-from datacontest.rest.jwt import JWTException, JWT_HEADER
+from datacontest.rest.decorators import login_required
 from datacontest.rest.utils import STATUS_CODES
-#from datacontest.rest.decorators import authenticate_and_inject_user
 
 blueprint = Blueprint('datathon', __name__)
-
-
-def login_required(f):
-    """
-     - Obtain the user associated to the provided Authentication header JWT token.
-     - and inject the user to the wrapped function.
-    """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not request.is_json:
-            return Response(
-                json.dumps({
-                    'type': res.ResponseFailure.PARAMETERS_ERROR,
-                    'message': 'Request body must be JSON.',
-                }),
-                mimetype='application/json',
-                status=STATUS_CODES[res.ResponseFailure.PARAMETERS_ERROR]
-            )
-
-        user_repo = user_memrepo.UserMemRepo()
-        try:
-            access_token = request.headers.get(JWT_HEADER)
-            user = jwt_current_identity(user_repo, access_token)
-        except JWTException as e:
-            return Response(
-                json.dumps({
-                    'type': res.ResponseFailure.AUTHORIZATION_ERROR,
-                    'message': str(e),
-                }),
-                mimetype='application/json',
-                status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
-            )
-
-        if user is None:
-            return Response(
-                json.dumps({
-                    'type': res.ResponseFailure.AUTHORIZATION_ERROR,
-                    'message': 'User not found!',
-                }),
-                mimetype='application/json',
-                status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
-            )
-
-        return f(user, *args, **kwargs)
-    return decorated_function
 
 
 @blueprint.route('/datathons', methods=['GET'])

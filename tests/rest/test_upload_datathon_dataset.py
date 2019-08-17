@@ -23,7 +23,7 @@ def test_upload_datathon_dataset_unauthenticated(client):
     assert response.status_code == 401
 
 
-@mock.patch('datacontest.rest.datathon.jwt_current_identity')
+@mock.patch('datacontest.rest.decorators.jwt_current_identity')
 def test_upload_datathon_with_non_existent_user(mock_jwt_identity, client):
     mock_jwt_identity.return_value = None
 
@@ -41,7 +41,7 @@ def test_upload_datathon_with_non_existent_user(mock_jwt_identity, client):
     assert response.status_code == 401
 
 
-@mock.patch('datacontest.rest.datathon.jwt_current_identity')
+@mock.patch('datacontest.rest.decorators.jwt_current_identity')
 def test_upload_datathon_dataset_to_non_existent_datathon(mock_jwt_identity, client):
     authenticated_user_mock = User('uuid-identifier', 'user', 'pass', 'email@email.com')
     mock_jwt_identity.return_value = authenticated_user_mock
@@ -64,7 +64,7 @@ def test_upload_datathon_dataset_to_non_existent_datathon(mock_jwt_identity, cli
     assert response.status_code == 404
 
 
-@mock.patch('datacontest.rest.datathon.jwt_current_identity')
+@mock.patch('datacontest.rest.decorators.jwt_current_identity')
 def test_upload_datathon_dataset_without_required_parameters(mock_jwt_identity, client):
     authenticated_user_mock = User('uuid-identifier', 'user', 'pass', 'email@email.com')
     mock_jwt_identity.return_value = authenticated_user_mock
@@ -87,7 +87,7 @@ def test_upload_datathon_dataset_without_required_parameters(mock_jwt_identity, 
 
 
 @mock.patch('datacontest.repositories.datathon.memrepo.DatathonMemRepo.find_by_id')
-@mock.patch('datacontest.rest.datathon.jwt_current_identity')
+@mock.patch('datacontest.rest.decorators.jwt_current_identity')
 def test_upload_datathon_dataset_without_being_the_organizer(mock_jwt_identity, mock_mem_repo, client):
     mock_mem_repo.return_value = Datathon.from_dict({
         'id': '91090b75-65e9-4253-975c-6f8ad0eaa955',
@@ -123,7 +123,7 @@ def test_upload_datathon_dataset_without_being_the_organizer(mock_jwt_identity, 
 
 @mock.patch('datacontest.repositories.dataset.memrepo.DatasetMemRepo.build_primary_key')
 @mock.patch('datacontest.repositories.datathon.memrepo.DatathonMemRepo.find_by_id')
-@mock.patch('datacontest.rest.datathon.jwt_current_identity')
+@mock.patch('datacontest.rest.decorators.jwt_current_identity')
 def test_upload_datathon_dataset(mock_jwt_identity, mock_mem_repo, mock_dataset_mem_repo, client):
     mock_dataset_mem_repo.return_value = 'new_dataset_id'
     mock_mem_repo.return_value = Datathon.from_dict({

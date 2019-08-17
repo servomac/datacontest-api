@@ -43,7 +43,7 @@ def test_create_datathon_unauthenticated(client):
     assert response.status_code == 401
 
 
-@mock.patch('datacontest.rest.datathon.jwt_current_identity')
+@mock.patch('datacontest.rest.decorators.jwt_current_identity')
 def test_create_datathon_with_non_existent_user(mock_jwt_identity, client):
     mock_jwt_identity.return_value = None
 
@@ -61,7 +61,7 @@ def test_create_datathon_with_non_existent_user(mock_jwt_identity, client):
 
 
 @mock.patch('datacontest.repositories.memrepo.MemRepo.build_primary_key')
-@mock.patch('datacontest.rest.datathon.jwt_current_identity')
+@mock.patch('datacontest.rest.decorators.jwt_current_identity')
 def test_create_datathon(mock_jwt_identity, mock_mem_repo, client):
     mocked_datathon_id = 'fb3390ee-9a8e-42e9-9f81-c626bc38ba7f'
     mock_mem_repo.return_value = mocked_datathon_id

@@ -68,3 +68,22 @@ def test_rest_user_login_authentication_failure(mock_use_case, client):
     }
     assert response.status_code == 403
     assert response.mimetype == 'application/json'
+
+
+def test_rest_user_registration_and_login_success(client):
+    user = {'username': 'u', 'password': 'p', 'email': 'e@e.c'}
+    response = client.post('/user/registration',
+                           data=json.dumps(user),
+                           mimetype='application/json')
+
+    json_response = json.loads(response.data.decode('utf-8'))
+    assert json_response['username'] == 'u'
+    assert response.status_code == 201
+    assert response.mimetype == 'application/json'
+
+    response = client.post('/user/login',
+                           data=json.dumps({'username': 'u', 'password': 'p'}),
+                           mimetype='application/json')
+
+    assert response.status_code == 200
+    assert 'access_token' in json.loads(response.data)
