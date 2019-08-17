@@ -48,7 +48,8 @@ def test_create_datathon_with_non_existent_user(mock_jwt_identity, client):
     mock_jwt_identity.return_value = None
 
     response = client.post('/datathons',
-                           data=json.dumps({'access_token': 'any'}),
+                           data=json.dumps({}),
+                           headers={'Authorization': 'Bearer any'},
                            content_type='application/json')
 
     assert mock_jwt_identity.called
@@ -76,7 +77,8 @@ def test_create_datathon(mock_jwt_identity, mock_mem_repo, client):
         'end_date': '2019-01-01T00:00:00',
     }
     response = client.post('/datathons',
-                           data=json.dumps({**{'access_token': 'any'}, **data}),
+                           data=json.dumps(data),
+                           headers={'Authorization': 'Bearer any'},
                            content_type='application/json')
 
     assert mock_jwt_identity.called

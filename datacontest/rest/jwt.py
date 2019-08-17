@@ -3,6 +3,9 @@ from datetime import datetime, timedelta
 import jwt
 
 
+JWT_HEADER = 'Authorization'
+
+
 class JWTException(Exception):
     # TODO implement multiple errors
     pass

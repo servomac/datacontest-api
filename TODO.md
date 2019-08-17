@@ -6,6 +6,7 @@
 
  * JWT logic
    - Should be separated from our User domain model. Separation of concerns. Also separate configuration (secret, algorithm).
+   - ~~In REST API, the authorization should come as headers in the petition, not passing the token as part of the request json body~~.
 
  * Schema validation. The actual schema validation seems to be ocurring at the use case request objects level. Rethink.
 
@@ -15,8 +16,10 @@
 
  * An organizer can upload a dataset to a datathon
    - Only before the start date
+   - An authenticated used can download the dataset
+   - The dataset is validated
 
- * A registered user can send submissions to a datathon
+ * An authenticated user can send submissions to a datathon
    - Only when is open -between start and end date-
    - An organized can not send submissions
 

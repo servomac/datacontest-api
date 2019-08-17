@@ -29,9 +29,9 @@ def test_upload_datathon_with_non_existent_user(mock_jwt_identity, client):
 
     response = client.post(
         API_ENDPOINT.format(datathon_id='unexistent'),
-        data=json.dumps({'access_token': 'any'}),
-        content_type='application/json'
-    )
+        data=json.dumps({}),
+        headers={'Authorization': 'Bearer any'},
+        content_type='application/json')
 
     assert mock_jwt_identity.called
     assert json.loads(response.data) == {
@@ -49,14 +49,13 @@ def test_upload_datathon_dataset_to_non_existent_datathon(mock_jwt_identity, cli
     response = client.post(
         API_ENDPOINT.format(datathon_id='unexistent'),
         data=json.dumps({
-            'access_token': 'any',
             'training': 'any',
             'validation': 'any',
             'test': 'any',
             'target_column': 'any',
         }),
-        content_type='application/json'
-    )
+        headers={'Authorization': 'Bearer any'},
+        content_type='application/json')
 
     assert json.loads(response.data) == {
         'message': 'Datathon not found.',
@@ -72,9 +71,9 @@ def test_upload_datathon_dataset_without_required_parameters(mock_jwt_identity, 
 
     response = client.post(
         API_ENDPOINT.format(datathon_id='unexistent'),
-        data=json.dumps({'access_token': 'any'}),
-        content_type='application/json'
-    )
+        data=json.dumps({}),
+        headers={'Authorization': 'Bearer any'},
+        content_type='application/json')
 
     # TODO ara que ho pens, la resposta hauria de ser diferent, tipus {'type': 'ParameterError', 'messages: bla bla¿?}
     # es molt raro retornar una llista..

@@ -12,7 +12,7 @@ from datacontest.use_cases import request_objects as req
 
 from datacontest.shared import response_object as res
 from datacontest.rest.jwt import jwt_current_identity
-from datacontest.rest.jwt import JWTException
+from datacontest.rest.jwt import JWTException, JWT_HEADER
 from datacontest.rest.utils import STATUS_CODES
 #from datacontest.rest.decorators import authenticate_and_inject_user
 
@@ -21,7 +21,7 @@ blueprint = Blueprint('datathon', __name__)
 
 def login_required(f):
     """
-     - Obtain the user associated to the provided token.
+     - Obtain the user associated to the provided Authentication header JWT token.
      - and inject the user to the wrapped function.
     """
     @wraps(f)
@@ -36,10 +36,10 @@ def login_required(f):
                 status=STATUS_CODES[res.ResponseFailure.PARAMETERS_ERROR]
             )
 
-        data = request.get_json(silent=True) or {}
         user_repo = user_memrepo.UserMemRepo()
         try:
-            user = jwt_current_identity(user_repo, data.get('access_token'))
+            access_token = request.headers.get(JWT_HEADER)
+            user = jwt_current_identity(user_repo, access_token)
         except JWTException as e:
             return Response(
                 json.dumps({
