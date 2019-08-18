@@ -2,6 +2,8 @@ import datetime
 
 from unittest import mock
 
+from freezegun import freeze_time
+
 from datacontest.domain import models
 from datacontest.shared import response_object as res
 from datacontest.use_cases import request_objects as req
@@ -57,6 +59,7 @@ def test_upload_datathon_dataset_datathon_not_found():
     }
 
 
+@freeze_time('2018-01-01')
 def test_upload_datathon_dataset_user_is_not_datathon_organizer():
     datathon_repo = mock.Mock()
     datathon_repo.find_by_id.return_value = models.Datathon.from_dict({
@@ -66,6 +69,7 @@ def test_upload_datathon_dataset_user_is_not_datathon_organizer():
         'subtitle': 'subtitle',
         'description': 'desc',
         'metric': 'AUC',
+        'start_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
         'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
     })
     dataset_repo = mock.Mock()
@@ -98,6 +102,7 @@ def test_upload_datathon_dataset_failure():
         'subtitle': 'subtitle',
         'description': 'desc',
         'metric': 'AUC',
+        'start_date': datetime.datetime(2018, 1, 5, 10, 15, 0, 0),
         'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
     })
 
@@ -133,6 +138,7 @@ def test_upload_datathon_dataset_success():
         'subtitle': 'subtitle',
         'description': 'desc',
         'metric': 'AUC',
+        'start_date': datetime.datetime(2018, 1, 5, 10, 15, 0, 0),
         'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
     })
     domain_dataset = models.Dataset.from_dict({

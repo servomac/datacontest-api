@@ -61,12 +61,13 @@ class CreateDatathonRequestObject(req.ValidRequestObject):
     EXPECTED_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
     VALID_METRICS = ('AUC', 'ACCURACY', 'RMSE', 'RSE',)
 
-    def __init__(self, title, subtitle, description, metric, organizer_id, end_date):
+    def __init__(self, title, subtitle, description, metric, organizer_id, start_date, end_date):
         self.title = title
         self.subtitle = subtitle or ''
         self.description = description
         self.metric = metric or 'AUC'
         self.organizer_id = organizer_id
+        self.start_date = start_date
         self.end_date = end_date
 
     @classmethod
@@ -81,19 +82,20 @@ class CreateDatathonRequestObject(req.ValidRequestObject):
             elif not isinstance(data[arg], arg_type):
                 invalid_req.add_error(arg, 'Must be a {}.'.format(arg_type.__name__))
 
-        optional_args = ['metric', 'end_date', 'subtitle']
+        optional_args = ['metric', 'start_date', 'end_date', 'subtitle']
         for arg in optional_args:
             if arg in data and not isinstance(data.get(arg), str):
                 invalid_req.add_error(arg, 'Must be a string.')
 
-        if 'end_date' in data and isinstance(data['end_date'], str):
-            try:
-                data['end_date'] = datetime.strptime(
-                    data['end_date'],
-                    cls.EXPECTED_DATETIME_FORMAT,
-                )
-            except ValueError as ex:
-                invalid_req.add_error('end_date', 'Must be a valid ISO 8601')
+        for key in ['start_date', 'end_date']:
+            if key in data and isinstance(data[key], str):
+                try:
+                    data[key] = datetime.strptime(
+                        data[key],
+                        cls.EXPECTED_DATETIME_FORMAT,
+                    )
+                except ValueError as ex:
+                    invalid_req.add_error(key, 'Must be a valid ISO 8601')
 
         if 'metric' in data and isinstance(data['metric'], str):
             if data['metric'] not in cls.VALID_METRICS:
@@ -111,6 +113,7 @@ class CreateDatathonRequestObject(req.ValidRequestObject):
             description=data['description'],
             metric=data.get('metric', None),
             organizer_id=data['organizer_id'],
+            start_date=data.get('start_date', None),
             end_date=data.get('end_date', None),
         )
 

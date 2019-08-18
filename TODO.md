@@ -10,9 +10,11 @@
 
  * Schema validation. The actual schema validation seems to be ocurring at the use case request objects level. Rethink.
 
+ * Repositories should be part of the Config object, instead of global vars in rest files?
+
 ## Feature Backlog
 
- * (Bug) Validate datathon start and end date are in the future
+ * ~~(Bug) Validate datathon start and end date are in the future~~
 
  * An organizer can upload a dataset to a datathon
    - Only before the start date

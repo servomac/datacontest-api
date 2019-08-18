@@ -95,7 +95,8 @@ def test_upload_datathon_dataset_without_being_the_organizer(mock_jwt_identity, 
         'subtitle': 'Subtitle1',
         'description': 'Description1',
         'metric': 'AUC',
-        'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
+        'start_date': datetime.datetime(2018, 1, 5, 10, 15, 0, 0),
+        'end_date': datetime.datetime(2018, 1, 5, 15, 15, 0, 0),
         'organizer_id': 'f4b236a4-5085-41e9-86dc-29d6923010b3',
     })
 
@@ -132,6 +133,7 @@ def test_upload_datathon_dataset(mock_jwt_identity, mock_mem_repo, mock_dataset_
         'subtitle': 'Subtitle1',
         'description': 'Description1',
         'metric': 'AUC',
+        'start_date': datetime.datetime(2018, 1, 5, 10, 15, 0, 0),
         'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
         'organizer_id': 'f4b236a4-5085-41e9-86dc-29d6923010b3',
     })

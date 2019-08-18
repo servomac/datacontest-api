@@ -50,12 +50,13 @@ DomainModel.register(User)
 
 
 class Datathon:
-    def __init__(self, id, title, subtitle, description, metric, end_date, organizer_id):
+    def __init__(self, id, title, subtitle, description, metric, start_date, end_date, organizer_id):
         self.id = id
         self.title = title
         self.subtitle = subtitle
         self.description = description
         self.metric = metric
+        self.start_date = start_date
         self.end_date = end_date
         self.organizer_id = organizer_id
 
@@ -67,6 +68,7 @@ class Datathon:
             subtitle=data['subtitle'],
             description=data['description'],
             metric=data['metric'],
+            start_date=data['start_date'],
             end_date=data['end_date'],
             organizer_id=data['organizer_id'],
         )
