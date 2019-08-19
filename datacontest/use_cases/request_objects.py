@@ -193,8 +193,6 @@ class UploadDatathonDatasetRequestObject(req.ValidRequestObject):
             elif not isinstance(data[arg], str):
                 invalid_req.add_error(arg, 'Must be a string.')
 
-        # TODO validate valid b64 files? or in the use case, as other validations?
-
         if invalid_req.has_errors():
             return invalid_req
 

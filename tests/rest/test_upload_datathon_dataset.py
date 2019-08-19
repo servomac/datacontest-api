@@ -3,6 +3,8 @@ import json
 
 from unittest import mock
 
+from freezegun import freeze_time
+
 from datacontest.domain.models import User, Datathon
 
 
@@ -86,6 +88,7 @@ def test_upload_datathon_dataset_without_required_parameters(mock_jwt_identity, 
     assert response.status_code == 400
 
 
+@freeze_time('2018-01-01')
 @mock.patch('datacontest.repositories.datathon.memrepo.DatathonMemRepo.find_by_id')
 @mock.patch('datacontest.rest.decorators.jwt_current_identity')
 def test_upload_datathon_dataset_without_being_the_organizer(mock_jwt_identity, mock_mem_repo, client):
@@ -122,6 +125,7 @@ def test_upload_datathon_dataset_without_being_the_organizer(mock_jwt_identity, 
     assert response.status_code == 403
 
 
+@freeze_time('2018-01-01')
 @mock.patch('datacontest.repositories.dataset.memrepo.DatasetMemRepo.build_primary_key')
 @mock.patch('datacontest.repositories.datathon.memrepo.DatathonMemRepo.find_by_id')
 @mock.patch('datacontest.rest.decorators.jwt_current_identity')

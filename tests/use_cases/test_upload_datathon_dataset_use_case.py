@@ -94,6 +94,7 @@ def test_upload_datathon_dataset_user_is_not_datathon_organizer():
     }
 
 
+@freeze_time('2018-01-01')
 def test_upload_datathon_dataset_failure():
     domain_datathon = models.Datathon.from_dict({
         'id': 'datathon_id',
@@ -130,6 +131,7 @@ def test_upload_datathon_dataset_failure():
     assert bool(response_object) is False
 
 
+@freeze_time('2018-01-01')
 def test_upload_datathon_dataset_success():
     domain_datathon = models.Datathon.from_dict({
         'id': 'datathon_id',
@@ -182,3 +184,51 @@ def test_upload_datathon_dataset_success():
 
 # TODO als tests de user use cases he testetjat un side effect de l'add, i aquí no
 # com ho faig? homogeneitzar
+
+@freeze_time('2018-01-06')
+def test_upload_datathon_dataset_after_datathon_started():
+    domain_datathon = models.Datathon.from_dict({
+        'id': 'datathon_id',
+        'organizer_id': 'organizer_id',
+        'title': 'title',
+        'subtitle': 'subtitle',
+        'description': 'desc',
+        'metric': 'AUC',
+        'start_date': datetime.datetime(2018, 1, 5, 10, 15, 0, 0),
+        'end_date': datetime.datetime(2018, 1, 6, 13, 15, 0, 0),
+    })
+    domain_dataset = models.Dataset.from_dict({
+        'id': 'dataset_id',
+        'datathon_id': 'datathon_id',
+        'training': 'any',
+        'validation': 'any',
+        'test': 'any',
+        'target_column': 'any',
+    })
+
+    datathon_repo = mock.Mock()
+    datathon_repo.find_by_id.return_value = domain_datathon
+    dataset_repo = mock.Mock()
+    dataset_repo.build_primary_key.return_value = 'dataset_id'
+    dataset_repo.add.return_value = domain_dataset
+
+    use_case = uc.UploadDatathonDataset(datathon_repo, dataset_repo)
+    request_object = req.UploadDatathonDatasetRequestObject.from_dict({
+        'datathon_id': 'datathon_id',
+        'user_id': 'organizer_id',
+        'training': 'training',
+        'validation': 'validation',
+        'test': 'test',
+        'target_column': 'target_column',
+    })
+
+    response_object = use_case.execute(request_object)
+
+    datathon_repo.find_by_id.assert_called_once_with('datathon_id')
+    dataset_repo.add.assert_not_called()
+
+    assert bool(response_object) is False
+    assert response_object.value == {
+        'message': 'You can only upload a dataset before the start date.',
+        'type': 'ParametersError'
+    }

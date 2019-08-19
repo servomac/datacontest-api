@@ -93,6 +93,14 @@ class UploadDatathonDataset(uc.UseCase):
                 'Only the organizer of a datathon can upload a dataset.'
             )
 
+        # datathon has not started yet
+        if domain_datathon.start_date <= datetime.now():
+            return res.ResponseFailure.build_parameters_error(
+                'You can only upload a dataset before the start date.'
+            )
+
+        # TODO validate valid b64 files? or in the use case, as other validations?
+
         identifier = self.dataset_repo.build_primary_key()
         domain_dataset = self.dataset_repo.add(
             id=identifier,
