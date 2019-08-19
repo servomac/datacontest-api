@@ -58,6 +58,12 @@ class DatasetDetailUseCase(uc.UseCase):
         self.datathon_repo = datathon_repo
         self.dataset_repo = dataset_repo
 
+    def _hide_test_sets(self, dataset_list):
+        for dataset in dataset_list:
+            dataset['test'] = 'hidden'
+
+        return dataset_list
+
     def process_request(self, request_object):
         # validate datathon exists
         domain_datathon = self.datathon_repo.find_by_id(request_object.id)
@@ -67,8 +73,21 @@ class DatasetDetailUseCase(uc.UseCase):
             )
 
         # TODO only a valid dataset, with the current implementation of upload dataset i can upload N datasets
-        # TODO validate is organizer (or datathon ended) to return everything
-        # if user is not organizer and the datathon has not started yet, invalid request
-        # if user is not organizer and the datathon is running, return only training and validation
         datasets = self.dataset_repo.find_by('datathon_id', request_object.id)
-        return res.ResponseSuccess(datasets)
+
+        is_organizer = (domain_datathon.organizer_id == request_object.user_id)
+        if is_organizer:
+            return res.ResponseSuccess(datasets)
+
+        # datathon is running
+        now = datetime.now()
+        if domain_datathon.start_date <= now <= domain_datathon.end_date:
+            return res.ResponseSuccess(self._hide_test_sets(datasets))
+
+        # datathon has ended
+        if domain_datathon.end_date <= now:
+            return res.ResponseSuccess(datasets)
+
+        return res.ResponseFailure.build_resource_error(
+            'Datathon has not started yet!'
+        )

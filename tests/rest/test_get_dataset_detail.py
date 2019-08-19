@@ -15,8 +15,8 @@ API_ENDPOINT = '/datathons/{datathon_id}/dataset'
 @mock.patch('datacontest.repositories.dataset.memrepo.DatasetMemRepo.find_by')
 @mock.patch('datacontest.repositories.datathon.memrepo.DatathonMemRepo.find_by_id')
 @mock.patch('datacontest.rest.decorators.jwt_current_identity')
-def test_datathon_dataset_detail_as_organizer(mock_jwt_identity, mock_mem_repo, mock_dataset_mem_repo, client):
-    mock_dataset_mem_repo.return_value = [Dataset.from_dict({
+def test_datathon_dataset_detail_as_organizer(mock_jwt_identity, mock_datathon_repo, mock_dataset_repo, client):
+    mock_dataset_repo.return_value = [Dataset.from_dict({
         'id': 'dataset_id',
         'datathon_id': '91090b75-65e9-4253-975c-6f8ad0eaa955',
         'training': 'any',
@@ -24,7 +24,7 @@ def test_datathon_dataset_detail_as_organizer(mock_jwt_identity, mock_mem_repo, 
         'test': 'any',
         'target_column': 'target_column',
     })]
-    mock_mem_repo.return_value = Datathon.from_dict({
+    mock_datathon_repo.return_value = Datathon.from_dict({
         'id': '91090b75-65e9-4253-975c-6f8ad0eaa955',
         'title': 'Title1',
         'subtitle': 'Subtitle1',
@@ -44,8 +44,8 @@ def test_datathon_dataset_detail_as_organizer(mock_jwt_identity, mock_mem_repo, 
         content_type='application/json'
     )
 
-    #mock_dataset_mem_repo.assert_called_with('datathon_id', '91090b75-65e9-4253-975c-6f8ad0eaa955')
-    #mock_mem_repo.assert_called_with('91090b75-65e9-4253-975c-6f8ad0eaa955')
+    mock_datathon_repo.assert_called_with('91090b75-65e9-4253-975c-6f8ad0eaa955')
+    mock_dataset_repo.assert_called_with('datathon_id', '91090b75-65e9-4253-975c-6f8ad0eaa955')
     assert json.loads(response.data) == [{
         'datathon_id': '91090b75-65e9-4253-975c-6f8ad0eaa955',
         'id': 'dataset_id',
@@ -57,8 +57,83 @@ def test_datathon_dataset_detail_as_organizer(mock_jwt_identity, mock_mem_repo, 
     assert response.status_code == 200
 
 
-# TODO unauthenticated
-# TODO unexistent datathon
+@freeze_time('2018-01-06')
+@mock.patch('datacontest.repositories.dataset.memrepo.DatasetMemRepo.find_by')
+@mock.patch('datacontest.repositories.datathon.memrepo.DatathonMemRepo.find_by_id')
+@mock.patch('datacontest.rest.decorators.jwt_current_identity')
+def test_datathon_dataset_detail_as_non_organizer_when_datathon_has_ended(mock_jwt_identity, mock_datathon_repo, mock_dataset_repo, client):
+    mock_dataset_repo.return_value = [Dataset.from_dict({
+        'id': 'dataset_id',
+        'datathon_id': '91090b75-65e9-4253-975c-6f8ad0eaa955',
+        'training': 'any',
+        'validation': 'any',
+        'test': 'any',
+        'target_column': 'target_column',
+    })]
+    mock_datathon_repo.return_value = Datathon.from_dict({
+        'id': '91090b75-65e9-4253-975c-6f8ad0eaa955',
+        'title': 'Title1',
+        'subtitle': 'Subtitle1',
+        'description': 'Description1',
+        'metric': 'AUC',
+        'start_date': datetime.datetime(2018, 1, 5, 10, 15, 0, 0),
+        'end_date': datetime.datetime(2018, 1, 5, 13, 15, 0, 0),
+        'organizer_id': 'f4b236a4-5085-41e9-86dc-29d6923010b3',
+    })
+
+    non_organizer_mock = User('diferent-uuid-than-the-organizer', 'user', 'pass', 'email@email.com')
+    mock_jwt_identity.return_value = non_organizer_mock
+
+    response = client.get(
+        API_ENDPOINT.format(datathon_id='91090b75-65e9-4253-975c-6f8ad0eaa955'),
+        headers={'Authorization': 'Bearer any'},
+        content_type='application/json'
+    )
+
+    mock_datathon_repo.assert_called_with('91090b75-65e9-4253-975c-6f8ad0eaa955')
+    assert json.loads(response.data) == [{
+        'datathon_id': '91090b75-65e9-4253-975c-6f8ad0eaa955',
+        'id': 'dataset_id',
+        'test': 'any',
+        'training': 'any',
+        'validation': 'any',
+        'target_column': 'target_column',
+    }]
+    assert response.status_code == 200
+
+
+def test_dataset_detail_unauthenticated_user(client):
+    response = client.get(
+        API_ENDPOINT.format(datathon_id='91090b75-65e9-4253-975c-6f8ad0eaa955'),
+        content_type='application/json'
+    )
+
+    assert json.loads(response.data) == {
+        'message': 'No token provided.',
+        'type': 'AuthorizationError',
+    }
+    assert response.status_code == 401
+
+
+@mock.patch('datacontest.rest.decorators.jwt_current_identity')
+def test_dataset_detail_unexistent_datathon(mock_jwt_identity, client):
+    user_mock = User('f4b236a4-5085-41e9-86dc-29d6923010b3', 'user', 'pass', 'email@email.com')
+    mock_jwt_identity.return_value = user_mock
+
+    response = client.get(
+        API_ENDPOINT.format(datathon_id='91090b75-65e9-4253-975c-6f8ad0eaa955'),
+        headers={'Authorization': 'Bearer any'},
+        content_type='application/json'
+    )
+
+    assert json.loads(response.data) == {
+        'message': 'Datathon not found.',
+        'type': 'ResourceError',
+    }
+    assert response.status_code == 404
+
+
+
 # TODO as non organizer
 # TODO as non organizer when the datathon has ended
 # TODO as non organizer when there is no dataset
