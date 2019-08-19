@@ -12,17 +12,7 @@ class UploadDatathonDataset(uc.UseCase):
         self.dataset_repo = dataset_repo
 
     def process_request(self, request_object):
-        """
-        Validate:
-            datathon exists
-            user requesting is the organizer
-            datathon has not still started
-            size and coherence of the dataset parts
-            target_column exists
-            datathon metric is compatible
-        """
-
-        # datathon exists
+        # validate datathon exists
         domain_datathon = self.datathon_repo.find_by_id(request_object.datathon_id)
         if domain_datathon is None:
             return res.ResponseFailure.build_resource_error(
@@ -42,6 +32,7 @@ class UploadDatathonDataset(uc.UseCase):
             )
 
         # TODO validate valid b64 files? or in the use case, as other validations?
+        # validate target colum exists
 
         identifier = self.dataset_repo.build_primary_key()
         domain_dataset = self.dataset_repo.add(
@@ -58,3 +49,26 @@ class UploadDatathonDataset(uc.UseCase):
             )
 
         return res.ResponseCreationSuccess(domain_dataset)
+
+
+class DatasetDetailUseCase(uc.UseCase):
+    """ Obtain the dataset of a datathon """
+
+    def __init__(self, datathon_repo, dataset_repo):
+        self.datathon_repo = datathon_repo
+        self.dataset_repo = dataset_repo
+
+    def process_request(self, request_object):
+        # validate datathon exists
+        domain_datathon = self.datathon_repo.find_by_id(request_object.id)
+        if domain_datathon is None:
+            return res.ResponseFailure.build_resource_error(
+                'Datathon not found.'
+            )
+
+        # TODO only a valid dataset, with the current implementation of upload dataset i can upload N datasets
+        # TODO validate is organizer (or datathon ended) to return everything
+        # if user is not organizer and the datathon has not started yet, invalid request
+        # if user is not organizer and the datathon is running, return only training and validation
+        datasets = self.dataset_repo.find_by('datathon_id', request_object.id)
+        return res.ResponseSuccess(datasets)

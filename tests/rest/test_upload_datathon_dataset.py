@@ -109,12 +109,12 @@ def test_upload_datathon_dataset_without_being_the_organizer(mock_jwt_identity, 
     response = client.post(
         API_ENDPOINT.format(datathon_id='unexistent'),
         data=json.dumps({
-            'access_token': 'any',
             'training': 'any',
             'validation': 'any',
             'test': 'any',
             'target_column': 'any',
         }),
+        headers={'Authorization': 'Bearer any'},
         content_type='application/json'
     )
 
@@ -148,12 +148,12 @@ def test_upload_datathon_dataset(mock_jwt_identity, mock_mem_repo, mock_dataset_
     response = client.post(
         API_ENDPOINT.format(datathon_id='91090b75-65e9-4253-975c-6f8ad0eaa955'),
         data=json.dumps({
-            'access_token': 'any',
             'training': 'any',
             'validation': 'any',
             'test': 'any',
-            'target_column': 'any',
+            'target_column': 'target_column',
         }),
+        headers={'Authorization': 'Bearer any'},
         content_type='application/json'
     )
 
@@ -164,5 +164,6 @@ def test_upload_datathon_dataset(mock_jwt_identity, mock_mem_repo, mock_dataset_
         'test': 'any',
         'training': 'any',
         'validation': 'any',
+        'target_column': 'target_column',
     }
     assert response.status_code == 201

@@ -11,6 +11,7 @@ class DatasetEncoder(json.JSONEncoder):
                 'training': o.training,
                 'validation': o.validation,
                 'test': o.test,
+                'target_column': o.target_column,
             }
         except AttributeError:
             return super().default(o)

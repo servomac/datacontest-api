@@ -119,6 +119,7 @@ class CreateDatathonRequestObject(req.ValidRequestObject):
 
 
 class UserRegistrationRequestObject(req.ValidRequestObject):
+
     def __init__(self, username, password, email):
         self.username = username
         self.password = password
@@ -204,3 +205,39 @@ class UploadDatathonDatasetRequestObject(req.ValidRequestObject):
             test=data['test'],
             target_column=data['target_column'],
         )
+
+
+class DatathonDatasetDetailRequestObject(req.ValidRequestObject):
+
+    def __init__(self, id, user_id):
+        self.id = id
+        self.user_id = user_id
+
+    @classmethod
+    def from_dict(cls, data):
+        invalid_req = req.InvalidRequestObject()
+
+        if 'id' not in data:
+            invalid_req.add_error('id', 'Its a mandatory parameter!')
+
+        if 'id' in data and not cls._valid_id(data['id']):
+            invalid_req.add_error('id', 'Should be a valid uuid.')
+
+        if 'user_id' not in data:
+            invalid_req.add_error('user_id', 'Its a mandatory parameter!')
+
+        if 'user_id' in data and not cls._valid_id(data['user_id']):
+            invalid_req.add_error('user_id', 'Should be a valid uuid.')
+
+        if invalid_req.has_errors():
+            return invalid_req
+
+        return DatathonDatasetDetailRequestObject(id=data['id'],
+                                                  user_id=data['user_id'])
+
+    @staticmethod
+    def _valid_id(id):
+        return isinstance(id, str)
+
+    def __nonzero__(self):
+        return True

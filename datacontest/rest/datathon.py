@@ -15,6 +15,9 @@ from datacontest.rest.utils import STATUS_CODES
 
 blueprint = Blueprint('datathon', __name__)
 
+datathon_repo = datathon_memrepo.DatathonMemRepo()
+dataset_repo = dataset_memrepo.DatasetMemRepo()
+
 
 @blueprint.route('/datathons', methods=['GET'])
 def datathons():
@@ -30,8 +33,7 @@ def datathons():
 
     request_object = req.DatathonListRequestObject.from_dict(query_params)
 
-    repo = datathon_memrepo.DatathonMemRepo()
-    use_case = datathon_uc.DatathonListUseCase(repo)
+    use_case = datathon_uc.DatathonListUseCase(datathon_repo)
 
     response = use_case.execute(request_object)
 
@@ -52,8 +54,7 @@ def create_datathon(user):
     if bool(request_object) is False:
         return Response(json.dumps(request_object.errors))
 
-    repo = datathon_memrepo.DatathonMemRepo()
-    use_case = datathon_uc.CreateDatathonUseCase(repo)
+    use_case = datathon_uc.CreateDatathonUseCase(datathon_repo)
 
     response = use_case.execute(request_object)
 
@@ -71,8 +72,7 @@ def datathon_detail(datathon_id):
         # TODO status code
         return Response(json.dumps(request_object.errors))
 
-    repo = datathon_memrepo.DatathonMemRepo()
-    use_case = datathon_uc.DatathonDetailUseCase(repo)
+    use_case = datathon_uc.DatathonDetailUseCase(datathon_repo)
 
     response = use_case.execute(request_object)
     return Response(
@@ -80,6 +80,25 @@ def datathon_detail(datathon_id):
         mimetype='application/json',
         status=STATUS_CODES[response.type]
     )
+
+
+
+# @blueprint.route('/datathons/<datathon_id>/', method="POST")
+# def datathon_subscription_or_update(datathon_id):
+#     """
+#     Endpoint representing different semantics depending on the user:
+#      - The organizer can update the datathon.
+#      - An user can join the competition while it's open.
+#     """
+#     pass
+
+
+
+# @blueprint.route('/datathons/<datathon_id>/', method="DELETE")
+# def datathon_delete(datathon_id):
+#    pass
+
+
 
 
 @blueprint.route('/datathons/<datathon_id>/dataset', methods=['POST'])
@@ -97,11 +116,9 @@ def upload_datathon_dataset(user, datathon_id):
             status=STATUS_CODES[res.ResponseFailure.PARAMETERS_ERROR]
         )
 
-    datathon_repo = datathon_memrepo.DatathonMemRepo()
-    dataset_repo = dataset_memrepo.DatasetMemRepo()
     use_case = dataset_uc.UploadDatathonDataset(datathon_repo, dataset_repo)
-
     response = use_case.execute(request_object)
+
     return Response(
         json.dumps(response.value, cls=dataset_serializer.DatasetEncoder),
         mimetype='application/json',
@@ -109,17 +126,24 @@ def upload_datathon_dataset(user, datathon_id):
     )
 
 
-# @blueprint.route('/datathons/<datathon_id>/', method="POST")
-# def datathon_subscription_or_update(datathon_id):
-#     """
-#     Endpoint representing different semantics depending on the user:
-#      - The organizer can update the datathon.
-#      - An user can join the competition while it's open.
-#     """
-#     pass
+@blueprint.route('/datathons/<datathon_id>/dataset', methods=['GET'])
+@login_required
+def datathon_dataset_detail(user, datathon_id):
+    args = {'user_id': user.id, 'id': datathon_id}
+    request_object = req.DatathonDatasetDetailRequestObject.from_dict(args)
+    if bool(request_object) is False:
+        # TODO return Encoder for failure request?
+        return Response(
+            json.dumps(request_object.errors),
+            mimetype='application/json',
+            status=STATUS_CODES[res.ResponseFailure.PARAMETERS_ERROR]
+        )
 
+    use_case = dataset_uc.DatasetDetailUseCase(datathon_repo, dataset_repo)
 
-
-# @blueprint.route('/datathons/<datathon_id>/', method="DELETE")
-# def datathon_delete(datathon_id):
-#    pass
+    response = use_case.execute(request_object)
+    return Response(
+        json.dumps(response.value, cls=dataset_serializer.DatasetEncoder),
+        mimetype='application/json',
+        status=STATUS_CODES[response.type],
+    )
