@@ -7,7 +7,7 @@ from freezegun import freeze_time
 from datacontest.domain import models
 from datacontest.shared import response_object as res
 from datacontest.use_cases import request_objects as req
-from datacontest.use_cases import datathon_use_cases as uc
+from datacontest.use_cases import dataset_use_cases as uc
 
 
 def test_upload_datathon_dataset_without_parameters():

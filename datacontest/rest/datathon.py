@@ -5,7 +5,8 @@ from flask import Blueprint, Response, request
 from datacontest.repositories.dataset import memrepo as dataset_memrepo
 from datacontest.repositories.datathon import memrepo as datathon_memrepo
 from datacontest.serializers import datathon_serializer, dataset_serializer
-from datacontest.use_cases import datathon_use_cases as uc
+from datacontest.use_cases import datathon_use_cases as datathon_uc
+from datacontest.use_cases import dataset_use_cases as dataset_uc
 from datacontest.use_cases import request_objects as req
 
 from datacontest.shared import response_object as res
@@ -30,7 +31,7 @@ def datathons():
     request_object = req.DatathonListRequestObject.from_dict(query_params)
 
     repo = datathon_memrepo.DatathonMemRepo()
-    use_case = uc.DatathonListUseCase(repo)
+    use_case = datathon_uc.DatathonListUseCase(repo)
 
     response = use_case.execute(request_object)
 
@@ -52,7 +53,7 @@ def create_datathon(user):
         return Response(json.dumps(request_object.errors))
 
     repo = datathon_memrepo.DatathonMemRepo()
-    use_case = uc.CreateDatathonUseCase(repo)
+    use_case = datathon_uc.CreateDatathonUseCase(repo)
 
     response = use_case.execute(request_object)
 
@@ -71,7 +72,7 @@ def datathon_detail(datathon_id):
         return Response(json.dumps(request_object.errors))
 
     repo = datathon_memrepo.DatathonMemRepo()
-    use_case = uc.DatathonDetailUseCase(repo)
+    use_case = datathon_uc.DatathonDetailUseCase(repo)
 
     response = use_case.execute(request_object)
     return Response(
@@ -98,7 +99,7 @@ def upload_datathon_dataset(user, datathon_id):
 
     datathon_repo = datathon_memrepo.DatathonMemRepo()
     dataset_repo = dataset_memrepo.DatasetMemRepo()
-    use_case = uc.UploadDatathonDataset(datathon_repo, dataset_repo)
+    use_case = dataset_uc.UploadDatathonDataset(datathon_repo, dataset_repo)
 
     response = use_case.execute(request_object)
     return Response(
