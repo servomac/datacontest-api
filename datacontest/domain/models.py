@@ -94,6 +94,15 @@ class Dataset:
             target_column=data['target_column'],
         )
 
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'datathon_id': self.datathon_id,
+            'training': self.training,
+            'validation': self.validation,
+            'test': self.test,
+            'target_column': self.target_column,
+        }
 
 # https://docs.python.org/3/library/abc.html
 # You can also register unrelated concrete classes (even built-in classes)

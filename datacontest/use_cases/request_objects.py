@@ -209,31 +209,28 @@ class UploadDatathonDatasetRequestObject(req.ValidRequestObject):
 
 class DatathonDatasetDetailRequestObject(req.ValidRequestObject):
 
-    def __init__(self, id, user_id):
-        self.id = id
+    def __init__(self, datathon_id, user_id):
+        self.datathon_id = datathon_id
         self.user_id = user_id
 
     @classmethod
     def from_dict(cls, data):
         invalid_req = req.InvalidRequestObject()
 
-        if 'id' not in data:
-            invalid_req.add_error('id', 'Its a mandatory parameter!')
-
-        if 'id' in data and not cls._valid_id(data['id']):
-            invalid_req.add_error('id', 'Should be a valid uuid.')
-
-        if 'user_id' not in data:
-            invalid_req.add_error('user_id', 'Its a mandatory parameter!')
-
-        if 'user_id' in data and not cls._valid_id(data['user_id']):
-            invalid_req.add_error('user_id', 'Should be a valid uuid.')
+        required_args = ['datathon_id', 'user_id']
+        for arg in required_args:
+            if arg not in data:
+                invalid_req.add_error(arg, 'Its a mandatory parameter!')
+            elif not isinstance(data[arg], str):
+                invalid_req.add_error(arg, 'Should be a valid uuid.')
 
         if invalid_req.has_errors():
             return invalid_req
 
-        return DatathonDatasetDetailRequestObject(id=data['id'],
-                                                  user_id=data['user_id'])
+        return DatathonDatasetDetailRequestObject(
+            datathon_id=data['datathon_id'],
+            user_id=data['user_id']
+        )
 
     @staticmethod
     def _valid_id(id):

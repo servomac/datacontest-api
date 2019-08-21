@@ -129,7 +129,7 @@ def upload_datathon_dataset(user, datathon_id):
 @blueprint.route('/datathons/<datathon_id>/dataset', methods=['GET'])
 @login_required
 def datathon_dataset_detail(user, datathon_id):
-    args = {'user_id': user.id, 'id': datathon_id}
+    args = {'user_id': user.id, 'datathon_id': datathon_id}
     request_object = req.DatathonDatasetDetailRequestObject.from_dict(args)
     if bool(request_object) is False:
         # TODO return Encoder for failure request?

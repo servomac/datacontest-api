@@ -22,6 +22,7 @@ def test_upload_datathon_dataset_without_parameters():
     # TODO aixo no m'agrada perque estic responent a l'usuari que necessita introduir user_id quan no és vera
     # estic 'leacking' informació interna de paràmetres de l'API del request object, quan l'usuari final del
     # l'api rest enviarà un token, no el seu user_id... revisar!
+    # idea1: domés és un problema si ho expos al usuari via rest, no esta malament que ho respongui l'use case
     assert bool(response_object) is False
     assert response_object.value == {
         'message': 'datathon_id: Its a mandatory parameter!\n'

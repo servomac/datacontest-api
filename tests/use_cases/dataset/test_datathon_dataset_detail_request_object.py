@@ -4,10 +4,10 @@ from datacontest.use_cases import request_objects as ro
 
 
 def test_build_datathon_dataset_detail_request_object_success():
-    req = ro.DatathonDatasetDetailRequestObject(id='uuid', user_id='uuid')
+    req = ro.DatathonDatasetDetailRequestObject(datathon_id='uuid', user_id='uuid')
 
     assert bool(req) is True
-    assert req.id == 'uuid'
+    assert req.datathon_id == 'uuid'
     assert req.user_id == 'uuid'
 
 
@@ -17,10 +17,10 @@ def test_build_datathon_dataset_detail_request_object_without_params():
 
 
 def test_build_datathon_dataset_detail_request_object_from_dict():
-    req = ro.DatathonDatasetDetailRequestObject.from_dict({'id': 'uuid', 'user_id': 'uuid'})
+    req = ro.DatathonDatasetDetailRequestObject.from_dict({'datathon_id': 'uuid', 'user_id': 'uuid'})
 
     assert bool(req) is True
-    assert req.id == 'uuid'
+    assert req.datathon_id == 'uuid'
     assert req.user_id == 'uuid'
 
 
@@ -29,7 +29,7 @@ def test_build_datathon_dataset_detail_request_object_from_empty_dict():
 
     assert req.has_errors()
     assert req.errors == [{
-        'parameter': 'id',
+        'parameter': 'datathon_id',
         'message': 'Its a mandatory parameter!',
     },
     {
@@ -40,11 +40,11 @@ def test_build_datathon_dataset_detail_request_object_from_empty_dict():
 
 
 def test_build_datathon_dataset_detail_request_object_from_dict_with_invalid_id():
-    req = ro.DatathonDatasetDetailRequestObject.from_dict({'id': None, 'user_id': 1})
+    req = ro.DatathonDatasetDetailRequestObject.from_dict({'datathon_id': None, 'user_id': 1})
 
     assert req.has_errors()
     assert req.errors == [{
-        'parameter': 'id',
+        'parameter': 'datathon_id',
         'message': 'Should be a valid uuid.',
     },
     {

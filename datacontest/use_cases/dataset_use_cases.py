@@ -58,22 +58,21 @@ class DatasetDetailUseCase(uc.UseCase):
         self.datathon_repo = datathon_repo
         self.dataset_repo = dataset_repo
 
-    def _hide_test_sets(self, dataset_list):
-        for dataset in dataset_list:
-            dataset['test'] = 'hidden'
-
-        return dataset_list
+    def _hide_test_set(self, dataset):
+        dataset.test = 'Hidden'
+        return dataset
 
     def process_request(self, request_object):
         # validate datathon exists
-        domain_datathon = self.datathon_repo.find_by_id(request_object.id)
+        domain_datathon = self.datathon_repo.find_by_id(request_object.datathon_id)
         if domain_datathon is None:
             return res.ResponseFailure.build_resource_error(
                 'Datathon not found.'
             )
 
-        # TODO only a valid dataset, with the current implementation of upload dataset i can upload N datasets
-        datasets = self.dataset_repo.find_by('datathon_id', request_object.id)
+        # TODO only a valid dataset, with the current implementation
+        #  of upload dataset i can upload N datasets
+        datasets = self.dataset_repo.find_by('datathon_id', request_object.datathon_id)
 
         is_organizer = (domain_datathon.organizer_id == request_object.user_id)
         if is_organizer:
@@ -82,7 +81,7 @@ class DatasetDetailUseCase(uc.UseCase):
         # datathon is running
         now = datetime.now()
         if domain_datathon.start_date <= now <= domain_datathon.end_date:
-            return res.ResponseSuccess(self._hide_test_sets(datasets))
+            return res.ResponseSuccess([self._hide_test_set(d) for d in datasets])
 
         # datathon has ended
         if domain_datathon.end_date <= now:
