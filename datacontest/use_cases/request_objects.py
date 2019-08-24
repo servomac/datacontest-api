@@ -3,6 +3,9 @@
 
 import collections
 from datetime import datetime
+from io import StringIO
+
+import pandas as pd
 
 from datacontest.shared import request_object as req
 
@@ -175,6 +178,9 @@ class UserLoginRequestObject(req.ValidRequestObject):
 
 
 class UploadDatathonDatasetRequestObject(req.ValidRequestObject):
+    MIN_ROWS = 2
+    MIN_COLS = 2
+
     def __init__(self, datathon_id, user_id, training, validation, test, target_column):
         self.datathon_id = datathon_id
         self.user_id = user_id
@@ -193,6 +199,24 @@ class UploadDatathonDatasetRequestObject(req.ValidRequestObject):
                 invalid_req.add_error(arg, 'Its a mandatory parameter!')
             elif not isinstance(data[arg], str):
                 invalid_req.add_error(arg, 'Must be a string.')
+
+        import pandas as pd
+
+        csv_args = ['training', 'validation', 'test']
+        for arg in csv_args:
+            if arg in data and isinstance(data.get(arg), str):
+                df = pd.read_csv(StringIO(data[arg]))
+
+                rows, cols = df.shape
+                if cols < cls.MIN_COLS:
+                    invalid_req.add_error(arg, f'Must be a valid csv with at least {cls.MIN_COLS} columns.')
+
+                if rows < cls.MIN_ROWS:
+                    invalid_req.add_error(arg, f'Must be a valid csv with at least {cls.MIN_ROWS} rows.')
+
+                if 'target_column' in data and isinstance(data.get(arg), str):
+                    if data['target_column'] not in df.columns:
+                        invalid_req.add_error(arg, f'Must be a valid csv containing the target column.')
 
         if invalid_req.has_errors():
             return invalid_req

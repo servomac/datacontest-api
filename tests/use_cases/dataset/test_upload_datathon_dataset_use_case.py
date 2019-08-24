@@ -10,6 +10,13 @@ from datacontest.use_cases import request_objects as req
 from datacontest.use_cases import dataset_use_cases as uc
 
 
+TARGET_COLUMN = 'target'
+VALID_CSV = """
+col1,col2,target
+0,0,0
+0,1,1
+"""
+
 def test_upload_datathon_dataset_without_parameters():
     datathon_repo = mock.Mock()
     dataset_repo = mock.Mock()
@@ -44,10 +51,10 @@ def test_upload_datathon_dataset_datathon_not_found():
     request_object = req.UploadDatathonDatasetRequestObject.from_dict({
         'datathon_id': 'datathon_identifier',
         'user_id': 'organizer_identifier',
-        'training': 'any',
-        'validation': 'any',
-        'test': 'any',
-        'target_column': 'any',
+        'training': VALID_CSV,
+        'validation': VALID_CSV,
+        'test': VALID_CSV,
+        'target_column': TARGET_COLUMN,
     })
 
     response_object = use_case.execute(request_object)
@@ -79,10 +86,10 @@ def test_upload_datathon_dataset_user_is_not_datathon_organizer():
     request_object = req.UploadDatathonDatasetRequestObject.from_dict({
         'datathon_id': 'datathon_identifier',
         'user_id': 'not_organizer!',
-        'training': 'any',
-        'validation': 'any',
-        'test': 'any',
-        'target_column': 'any',
+        'training': VALID_CSV,
+        'validation': VALID_CSV,
+        'test': VALID_CSV,
+        'target_column': TARGET_COLUMN,
     })
 
     response_object = use_case.execute(request_object)
@@ -117,10 +124,10 @@ def test_upload_datathon_dataset_failure():
     request_object = req.UploadDatathonDatasetRequestObject.from_dict({
         'datathon_id': 'datathon_id',
         'user_id': 'organizer_id',
-        'training': 'any',
-        'validation': 'any',
-        'test': 'any',
-        'target_column': 'any',
+        'training': VALID_CSV,
+        'validation': VALID_CSV,
+        'test': VALID_CSV,
+        'target_column': TARGET_COLUMN,
     })
 
     response_object = use_case.execute(request_object)
@@ -163,10 +170,10 @@ def test_upload_datathon_dataset_success():
     request_object = req.UploadDatathonDatasetRequestObject.from_dict({
         'datathon_id': 'datathon_id',
         'user_id': 'organizer_id',
-        'training': 'training',
-        'validation': 'validation',
-        'test': 'test',
-        'target_column': 'target_column',
+        'training': VALID_CSV,
+        'validation': VALID_CSV,
+        'test': VALID_CSV,
+        'target_column': TARGET_COLUMN,
     })
 
     response_object = use_case.execute(request_object)
@@ -175,10 +182,10 @@ def test_upload_datathon_dataset_success():
     dataset_repo.add.assert_called_once_with(
         id='dataset_id',
         datathon_id='datathon_id',
-        training='training',
-        validation='validation',
-        test='test',
-        target_column='target_column'
+        training=VALID_CSV,
+        validation=VALID_CSV,
+        test=VALID_CSV,
+        target_column=TARGET_COLUMN
     )
     assert bool(response_object) is True
     assert response_object.value == domain_dataset
@@ -217,10 +224,10 @@ def test_upload_datathon_dataset_after_datathon_started():
     request_object = req.UploadDatathonDatasetRequestObject.from_dict({
         'datathon_id': 'datathon_id',
         'user_id': 'organizer_id',
-        'training': 'training',
-        'validation': 'validation',
-        'test': 'test',
-        'target_column': 'target_column',
+        'training': VALID_CSV,
+        'validation': VALID_CSV,
+        'test': VALID_CSV,
+        'target_column': TARGET_COLUMN,
     })
 
     response_object = use_case.execute(request_object)

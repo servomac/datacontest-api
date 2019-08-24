@@ -9,6 +9,12 @@ from datacontest.domain.models import User, Datathon
 
 
 API_ENDPOINT = '/datathons/{datathon_id}/dataset'
+TARGET_COLUMN = 'target'
+VALID_CSV = """
+col1,col2,target
+0,0,0
+0,1,1
+"""
 
 
 def test_upload_datathon_dataset_unauthenticated(client):
@@ -51,10 +57,10 @@ def test_upload_datathon_dataset_to_non_existent_datathon(mock_jwt_identity, cli
     response = client.post(
         API_ENDPOINT.format(datathon_id='unexistent'),
         data=json.dumps({
-            'training': 'any',
-            'validation': 'any',
-            'test': 'any',
-            'target_column': 'any',
+            'training': VALID_CSV,
+            'validation': VALID_CSV,
+            'test': VALID_CSV,
+            'target_column': TARGET_COLUMN,
         }),
         headers={'Authorization': 'Bearer any'},
         content_type='application/json')
@@ -109,10 +115,10 @@ def test_upload_datathon_dataset_without_being_the_organizer(mock_jwt_identity, 
     response = client.post(
         API_ENDPOINT.format(datathon_id='unexistent'),
         data=json.dumps({
-            'training': 'any',
-            'validation': 'any',
-            'test': 'any',
-            'target_column': 'any',
+            'training': VALID_CSV,
+            'validation': VALID_CSV,
+            'test': VALID_CSV,
+            'target_column': TARGET_COLUMN,
         }),
         headers={'Authorization': 'Bearer any'},
         content_type='application/json'
@@ -148,10 +154,10 @@ def test_upload_datathon_dataset(mock_jwt_identity, mock_mem_repo, mock_dataset_
     response = client.post(
         API_ENDPOINT.format(datathon_id='91090b75-65e9-4253-975c-6f8ad0eaa955'),
         data=json.dumps({
-            'training': 'any',
-            'validation': 'any',
-            'test': 'any',
-            'target_column': 'target_column',
+            'training': VALID_CSV,
+            'validation': VALID_CSV,
+            'test': VALID_CSV,
+            'target_column': TARGET_COLUMN,
         }),
         headers={'Authorization': 'Bearer any'},
         content_type='application/json'
@@ -161,9 +167,9 @@ def test_upload_datathon_dataset(mock_jwt_identity, mock_mem_repo, mock_dataset_
     assert json.loads(response.data) == {
         'datathon_id': '91090b75-65e9-4253-975c-6f8ad0eaa955',
         'id': 'new_dataset_id',
-        'test': 'any',
-        'training': 'any',
-        'validation': 'any',
-        'target_column': 'target_column',
+        'test': VALID_CSV,
+        'training': VALID_CSV,
+        'validation': VALID_CSV,
+        'target_column': TARGET_COLUMN,
     }
     assert response.status_code == 201
