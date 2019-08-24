@@ -11,6 +11,7 @@ class DatathonEncoder(json.JSONEncoder):
                 'subtitle': o.subtitle,
                 'description': o.description,
                 'metric': o.metric,
+                'start_date': o.start_date.isoformat(),
                 'end_date': o.end_date.isoformat(),
                 'organizer_id': o.organizer_id,
             }

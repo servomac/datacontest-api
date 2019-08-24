@@ -50,12 +50,13 @@ DomainModel.register(User)
 
 
 class Datathon:
-    def __init__(self, id, title, subtitle, description, metric, end_date, organizer_id):
+    def __init__(self, id, title, subtitle, description, metric, start_date, end_date, organizer_id):
         self.id = id
         self.title = title
         self.subtitle = subtitle
         self.description = description
         self.metric = metric
+        self.start_date = start_date
         self.end_date = end_date
         self.organizer_id = organizer_id
 
@@ -67,10 +68,41 @@ class Datathon:
             subtitle=data['subtitle'],
             description=data['description'],
             metric=data['metric'],
+            start_date=data['start_date'],
             end_date=data['end_date'],
             organizer_id=data['organizer_id'],
         )
 
+
+class Dataset:
+    def __init__(self, id, datathon_id, training, validation, test, target_column):
+        self.id = id
+        self.datathon_id = datathon_id
+        self.training = training
+        self.validation = validation
+        self.test = test
+        self.target_column = target_column
+
+    @classmethod
+    def from_dict(cls, data):
+        return Dataset(
+            id=data['id'],
+            datathon_id=data['datathon_id'],
+            training=data['training'],
+            validation=data['validation'],
+            test=data['test'],
+            target_column=data['target_column'],
+        )
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'datathon_id': self.datathon_id,
+            'training': self.training,
+            'validation': self.validation,
+            'test': self.test,
+            'target_column': self.target_column,
+        }
 
 # https://docs.python.org/3/library/abc.html
 # You can also register unrelated concrete classes (even built-in classes)

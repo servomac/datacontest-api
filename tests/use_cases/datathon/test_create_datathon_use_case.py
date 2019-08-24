@@ -17,6 +17,7 @@ def domain_datathons():
         subtitle='Subtitle1',
         description='Description1',
         metric='AUC',
+        start_date=datetime.datetime(2018, 1, 6, 10, 15, 0, 0),
         end_date=datetime.datetime(2018, 1, 6, 13, 15, 0, 0),
         organizer_id='f4b236a4-5085-41e9-86dc-29d6923010b3')
 
@@ -26,6 +27,7 @@ def domain_datathons():
         subtitle='Subtitle2',
         description='Description2',
         metric='AUC',
+        start_date=datetime.datetime(2018, 1, 6, 10, 15, 0, 0),
         end_date=datetime.datetime(2018, 1, 1, 13, 15, 0, 0),
         organizer_id='f4b236a4-5085-41e9-86dc-29d6923010b3')
 
@@ -49,7 +51,7 @@ def test_create_datathon_without_parameters():
     }
 
 
-@freeze_time('2018-01-01')
+@freeze_time('2017-12-28')
 def test_create_datathon_success(domain_datathons):
     repo = mock.Mock()
     repo.build_primary_key.return_value = 'mocked_id'
@@ -63,6 +65,7 @@ def test_create_datathon_success(domain_datathons):
         'subtitle': 'Subtitle',
         'description': 'Description',
         'metric': 'AUC',
+        'start_date': '2018-01-01T00:00:00',
         'end_date': '2018-01-01T10:10:10',
         'organizer_id': 'organizer_id',
     })
@@ -75,7 +78,8 @@ def test_create_datathon_success(domain_datathons):
         title='Title',
         subtitle='Subtitle',
         description='Description',
-        end_date=datetime.datetime(2018,1,1,10,10,10),
+        start_date=datetime.datetime(2018, 1, 1, 0, 0, 0),
+        end_date=datetime.datetime(2018, 1, 1, 10, 10, 10),
         metric='AUC',
         organizer_id='organizer_id',
     )
@@ -83,4 +87,51 @@ def test_create_datathon_success(domain_datathons):
     assert response_object.value == {'mock': 'response'}
 
 
-# TODO test_create_datathon_failure
+@freeze_time('2018-01-01')
+def test_create_datathon_start_date_in_past():
+    repo = mock.Mock()
+    create_datathon_use_case = uc.CreateDatathonUseCase(repo)
+
+    request_object = req.CreateDatathonRequestObject.from_dict({
+        'title': 'Title',
+        'subtitle': 'Subtitle',
+        'description': 'Description',
+        'metric': 'AUC',
+        'start_date': '2000-01-01T00:00:00',
+        'end_date': '2018-01-01T10:10:10',
+        'organizer_id': 'organizer_id',
+    })
+
+    response_object = create_datathon_use_case.execute(request_object)
+
+    assert bool(response_object) is False
+    repo.add.assert_not_called()
+    assert response_object.value == {
+        'message': 'Start date must be in the future.',
+        'type': 'ParametersError',
+    }
+
+
+@freeze_time('2018-01-01')
+def test_create_datathon_end_date_before_start_date():
+    repo = mock.Mock()
+    create_datathon_use_case = uc.CreateDatathonUseCase(repo)
+
+    request_object = req.CreateDatathonRequestObject.from_dict({
+        'title': 'Title',
+        'subtitle': 'Subtitle',
+        'description': 'Description',
+        'metric': 'AUC',
+        'start_date': '2019-01-01T00:00:00',
+        'end_date': '2018-01-01T10:10:10',
+        'organizer_id': 'organizer_id',
+    })
+
+    response_object = create_datathon_use_case.execute(request_object)
+
+    assert bool(response_object) is False
+    repo.add.assert_not_called()
+    assert response_object.value == {
+        'message': 'End date must be after start date.',
+        'type': 'ParametersError',
+    }

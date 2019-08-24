@@ -11,6 +11,7 @@ datathon = {
     'subtitle': 'Subtitle1',
     'description': 'Description1',
     'metric': 'AUC',
+    'start_date': datetime.datetime(2018, 1, 5, 18, 1, 9, 910076),
     'end_date': datetime.datetime(2018, 1, 5, 18, 20, 9, 910076),
     'organizer_id': '971ce791-489b-46ab-ae78-a5eca3beaa5a',
 }
@@ -26,6 +27,7 @@ def test_get(mock_use_case, client):
     response = client.get('/datathons/{}'.format(datathon['id']))
 
     expected_datathon = datathon
+    expected_datathon['start_date'] = expected_datathon['start_date'].isoformat()
     expected_datathon['end_date'] = expected_datathon['end_date'].isoformat()
 
     assert json.loads(response.data.decode('utf-8')) == expected_datathon

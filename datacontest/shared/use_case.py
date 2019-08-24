@@ -12,6 +12,8 @@ class UseCase:
         try:
             return self.process_request(request_object)
         except Exception as exc:
+            # TODO log
+            print(exc)
             return res.ResponseFailure.build_system_error(
                 '{}: {}'.format(exc.__class__.__name__, str(exc))
             )

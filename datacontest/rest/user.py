@@ -13,6 +13,7 @@ from datacontest.rest.utils import STATUS_CODES
 blueprint = Blueprint('user', __name__)
 jwt = JWTManager()
 
+user_repo = memrepo.UserMemRepo()
 
 @blueprint.route('/user/registration', methods=['POST'])
 def register():
@@ -22,8 +23,7 @@ def register():
     if bool(request_object) is False:
         return Response(json.dumps(request_object.errors))
 
-    repo = memrepo.UserMemRepo()
-    use_case = uc.UserRegistrationUseCase(repo)
+    use_case = uc.UserRegistrationUseCase(user_repo)
 
     response = use_case.execute(request_object)
 
@@ -45,8 +45,7 @@ def login():
     if bool(request_object) is False:
         return Response(json.dumps(request_object.errors))
 
-    repo = memrepo.UserMemRepo()
-    use_case = uc.UserLoginUseCase(repo)
+    use_case = uc.UserLoginUseCase(user_repo)
 
     response = use_case.execute(request_object)
     if bool(response) is True:
@@ -62,3 +61,6 @@ def login():
 
 def logout():
     pass
+
+
+# TODO refresh

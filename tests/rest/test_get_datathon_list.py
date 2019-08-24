@@ -12,6 +12,7 @@ datathon_1 = {
     'subtitle': 'Subtitle1',
     'description': 'Description1',
     'metric': 'AUC',
+    'start_date': datetime.datetime(2018, 1, 3, 13, 15, 0, 0),
     'end_date': datetime.datetime(2018, 1, 5, 18, 20, 9, 910076),
     'organizer_id': '231c3tt1-489b-46ab-ae78-a5eca4sealfa'
 }
@@ -25,6 +26,7 @@ def test_get(mock_use_case, client):
 
     response = client.get('/datathons')
 
+    datathon_1['start_date'] = datathon_1['start_date'].isoformat()
     datathon_1['end_date'] = datathon_1['end_date'].isoformat()
     assert json.loads(response.data.decode('UTF-8')) == [datathon_1]
     assert response.status_code == 200

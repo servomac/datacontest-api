@@ -1,66 +1,22 @@
-from functools import wraps
 import json
 
 from flask import Blueprint, Response, request
 
-from datacontest.repositories.datathon import memrepo
-from datacontest.repositories.user import memrepo as user_memrepo
-from datacontest.serializers import datathon_serializer
-from datacontest.use_cases import datathon_use_cases as uc
+from datacontest.repositories.dataset import memrepo as dataset_memrepo
+from datacontest.repositories.datathon import memrepo as datathon_memrepo
+from datacontest.serializers import datathon_serializer, dataset_serializer
+from datacontest.use_cases import datathon_use_cases as datathon_uc
+from datacontest.use_cases import dataset_use_cases as dataset_uc
 from datacontest.use_cases import request_objects as req
 
 from datacontest.shared import response_object as res
-from datacontest.rest.jwt import jwt_current_identity
-from datacontest.rest.jwt import JWTException
+from datacontest.rest.decorators import login_required
 from datacontest.rest.utils import STATUS_CODES
-#from datacontest.rest.decorators import authenticate_and_inject_user
 
 blueprint = Blueprint('datathon', __name__)
 
-
-def login_required(f):
-    """
-     - Obtain the user associated to the provided token.
-     - and inject the user to the wrapped function.
-    """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not request.is_json:
-            return Response(
-                json.dumps({
-                    'type': res.ResponseFailure.PARAMETERS_ERROR,
-                    'message': 'Request body must be JSON.',
-                }),
-                mimetype='application/json',
-                status=STATUS_CODES[res.ResponseFailure.PARAMETERS_ERROR]
-            )
-
-        data = request.get_json(silent=True) or {}
-        user_repo = user_memrepo.UserMemRepo()
-        try:
-            user = jwt_current_identity(user_repo, data.get('access_token'))
-        except JWTException as e:
-            return Response(
-                json.dumps({
-                    'type': res.ResponseFailure.AUTHORIZATION_ERROR,
-                    'message': str(e),
-                }),
-                mimetype='application/json',
-                status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
-            )
-
-        if user is None:
-            return Response(
-                json.dumps({
-                    'type': res.ResponseFailure.AUTHORIZATION_ERROR,
-                    'message': 'User not found!',
-                }),
-                mimetype='application/json',
-                status=STATUS_CODES[res.ResponseFailure.AUTHORIZATION_ERROR]
-            )
-
-        return f(user, *args, **kwargs)
-    return decorated_function
+datathon_repo = datathon_memrepo.DatathonMemRepo()
+dataset_repo = dataset_memrepo.DatasetMemRepo()
 
 
 @blueprint.route('/datathons', methods=['GET'])
@@ -77,8 +33,7 @@ def datathons():
 
     request_object = req.DatathonListRequestObject.from_dict(query_params)
 
-    repo = memrepo.DatathonMemRepo()
-    use_case = uc.DatathonListUseCase(repo)
+    use_case = datathon_uc.DatathonListUseCase(datathon_repo)
 
     response = use_case.execute(request_object)
 
@@ -93,14 +48,13 @@ def datathons():
 @login_required
 def create_datathon(user):
     args = request.get_json()
-
     args_and_user = {**args, **{'organizer_id': user.id}}
+
     request_object = req.CreateDatathonRequestObject.from_dict(args_and_user)
     if bool(request_object) is False:
         return Response(json.dumps(request_object.errors))
 
-    repo = memrepo.DatathonMemRepo()
-    use_case = uc.CreateDatathonUseCase(repo)
+    use_case = datathon_uc.CreateDatathonUseCase(datathon_repo)
 
     response = use_case.execute(request_object)
 
@@ -115,18 +69,18 @@ def create_datathon(user):
 def datathon_detail(datathon_id):
     request_object = req.DatathonDetailRequestObject(datathon_id)
     if bool(request_object) is False:
+        # TODO status code
         return Response(json.dumps(request_object.errors))
 
-    repo = memrepo.DatathonMemRepo()
-    use_case = uc.DatathonDetailUseCase(repo)
+    use_case = datathon_uc.DatathonDetailUseCase(datathon_repo)
 
     response = use_case.execute(request_object)
-
     return Response(
         json.dumps(response.value, cls=datathon_serializer.DatathonEncoder),
         mimetype='application/json',
         status=STATUS_CODES[response.type]
     )
+
 
 
 # @blueprint.route('/datathons/<datathon_id>/', method="POST")
@@ -143,3 +97,53 @@ def datathon_detail(datathon_id):
 # @blueprint.route('/datathons/<datathon_id>/', method="DELETE")
 # def datathon_delete(datathon_id):
 #    pass
+
+
+
+
+@blueprint.route('/datathons/<datathon_id>/dataset', methods=['POST'])
+@login_required
+def upload_datathon_dataset(user, datathon_id):
+    args = request.get_json()
+    args_and_user = {**args, **{'user_id': user.id, 'datathon_id': datathon_id}}
+
+    request_object = req.UploadDatathonDatasetRequestObject.from_dict(args_and_user)
+    if bool(request_object) is False:
+        # TODO return Encoder for failure request?
+        return Response(
+            json.dumps(request_object.errors),
+            mimetype='application/json',
+            status=STATUS_CODES[res.ResponseFailure.PARAMETERS_ERROR]
+        )
+
+    use_case = dataset_uc.UploadDatathonDataset(datathon_repo, dataset_repo)
+    response = use_case.execute(request_object)
+
+    return Response(
+        json.dumps(response.value, cls=dataset_serializer.DatasetEncoder),
+        mimetype='application/json',
+        status=STATUS_CODES[response.type],
+    )
+
+
+@blueprint.route('/datathons/<datathon_id>/dataset', methods=['GET'])
+@login_required
+def datathon_dataset_detail(user, datathon_id):
+    args = {'user_id': user.id, 'datathon_id': datathon_id}
+    request_object = req.DatathonDatasetDetailRequestObject.from_dict(args)
+    if bool(request_object) is False:
+        # TODO return Encoder for failure request?
+        return Response(
+            json.dumps(request_object.errors),
+            mimetype='application/json',
+            status=STATUS_CODES[res.ResponseFailure.PARAMETERS_ERROR]
+        )
+
+    use_case = dataset_uc.DatasetDetailUseCase(datathon_repo, dataset_repo)
+
+    response = use_case.execute(request_object)
+    return Response(
+        json.dumps(response.value, cls=dataset_serializer.DatasetEncoder),
+        mimetype='application/json',
+        status=STATUS_CODES[response.type],
+    )
