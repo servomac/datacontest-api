@@ -16,10 +16,10 @@
 
  * ~~(Bug) Validate datathon start and end date are in the future~~
 
- * An organizer can upload a dataset to a datathon
+ * ~~An organizer can upload a dataset to a datathon~~
    - ~~Only before the start date~~
-   - The dataset gets -synchronously- validated
-   - An authenticated used can download the dataset, but not test file (only the organizer can)
+   - ~~The dataset gets validated~~. Maybe I should also ask for a defined schema (types for the columns).
+   - ~~An authenticated used can download the dataset, but not test file (only the organizer can)~~
 
  * An authenticated user can send submissions to a datathon
    - Only when is open -between start and end date-
